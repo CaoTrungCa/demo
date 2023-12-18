@@ -22,7 +22,7 @@ export default function Login () {
                 password,
                 redirect: false
             });
-            router.replace("/dashboard");
+            router.replace("/");
         } catch (error) {
             console.error('Error saving data:', error);
         }

@@ -4,6 +4,7 @@ import { NextAuthOptions } from "next-auth";
 
 import { collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
 import { app } from '@/firebase/firebase';
+import { User } from "@/lib/collection";
 
 export const OPTIONS: NextAuthOptions = {
     providers: [
@@ -23,8 +24,8 @@ export const OPTIONS: NextAuthOptions = {
                 const db = getFirestore(app);
                 let userDataArray: any = [];
                 try {
-                    const u = await query(collection(db, "users"), where("username", "==", credentials?.username))
-                    const querySnapshot = await getDocs(u);
+                    const user = await query(collection(db, "users"), where("username", "==", credentials?.username))
+                    const querySnapshot = await getDocs(user);
                     querySnapshot.forEach((doc) => {
                         userDataArray.push(doc.data());
                     });
@@ -42,12 +43,55 @@ export const OPTIONS: NextAuthOptions = {
             }
         })
     ],
+    callbacks: {
+        async jwt({ token, user }: { token: any; user: User | null }) {
+            if (user) {
+                return {
+                    ...token,
+                    id: user.id,
+                    create_date: user.create_date,
+                    name: user.name,
+                    avatar: user.avatar,
+                    background: user.background,
+                    birthday: user.birthday,
+                    address: user.address,
+                    email: user.email,
+                    phone: user.phone,
+                    username: user.username,
+                    password: user.password,
+                    is_admin: user.is_admin,
+                };
+            }
+            return token;
+        },
+        async session({ session, token }: { session: any; token: any }) {
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    id: token.id,
+                    create_date: token.create_date,
+                    name: token.name,
+                    avatar: token.avatar,
+                    background: token.background,
+                    birthday: token.birthday,
+                    address: token.address,
+                    email: token.email,
+                    phone: token.phone,
+                    username: token.username,
+                    password: token.password,
+                    is_admin: token.is_admin,
+                },
+            };
+        }
+    },
     session: {
         strategy: "jwt",
     },
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
         signIn: "/auth/login",
+        signOut: "/"
     },
 }
 
