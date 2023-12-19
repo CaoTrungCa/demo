@@ -93,7 +93,7 @@ export default function Register () {
                 <div className="text-sm py-4">
                     Already have an account? <Link href="/auth/login" className="hover:text-blue-800 hover:underline">Log in</Link>
                 </div>
-                {error && <div className="text-red-500">{error}</div>}
+                {error && <div className="text-red-500 text-sm">{error}</div>}
             </form>
         </div>
     )
