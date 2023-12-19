@@ -53,7 +53,7 @@ export default function TheHeader() {
                   <Image
                     width={64}
                     height={64}
-                    src={'https://flowbite.com/docs/images/logo.svg'}
+                    src={(session.user as any).avatar ? (session.user as any).avatar : "/user/avatar_default.jpg"}
                     className="w-8 h-8 rounded-full"
                     alt="Cao Trung"
                   />

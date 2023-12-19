@@ -1,4 +1,5 @@
 'use client'
+import PageContainer from '@/components/PageContainer';
 import axios from 'axios';
 
 let API_URL ="6609235912:AAEDFEaY1WDxn8fwcRyb7gSsAFgLpqfR5Bg"
@@ -37,7 +38,7 @@ Message: ${message} `,
   };
 
   return (
-    <div>
+    <PageContainer>
       <div className="max-w-md mx-auto mt-8">
         <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit}>
           <p className="text-center text-3xl font-bold py-2">Contact us</p>
@@ -75,6 +76,6 @@ Message: ${message} `,
           </div>
         </form>
       </div>
-    </div>
+    </PageContainer>
   );
 }

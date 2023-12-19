@@ -1,6 +1,9 @@
+import PageContainer from "@/components/PageContainer";
 
 export default function Service() {
   return (
-    <div></div>
+    <PageContainer>
+      
+    </PageContainer>
   );
 }

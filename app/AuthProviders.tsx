@@ -10,11 +10,7 @@ export default function AuthProviders({ children }: {
 }) {
     return (
         <SessionProvider>
-            <TheHeader/>
-                <div className='py-12 mx-auto'>
-                    {children}
-                </div>
-            <TheFooter/>
+            {children}
         </SessionProvider>
     )
 }
