@@ -1,11 +1,11 @@
 import DashboardContainer from "@/components/DashboardContainer";
 
-export default function Dashboard() {
+export default function PostsDashboard() {
 
 
     return (
         <DashboardContainer>
-            Ok
+            Posts
         </DashboardContainer>
     )
 }

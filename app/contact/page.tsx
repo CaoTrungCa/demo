@@ -2,8 +2,8 @@
 import PageContainer from '@/components/PageContainer';
 import axios from 'axios';
 
-let API_URL ="6609235912:AAEDFEaY1WDxn8fwcRyb7gSsAFgLpqfR5Bg"
-let CHAT_ID ="-4075547264"
+let API_URL ="6986509758:AAGXhRZQswRB14Q9KVCPOsfULvxR0LDMEzc"
+let CHAT_ID ="-4051471487"
 
 export default function Contact() {
   const handleSubmit = async (event: any) => {
