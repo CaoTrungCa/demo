@@ -6,8 +6,12 @@ import { User } from "@/lib/collection";
 import DashboardContainer from "@/components/DashboardContainer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 export default function UsersDashboard() {
+    const { data: session } = useSession();
+
     const db = getFirestore(app);
     const [userData, setUserData] = useState<User[]>([]);
 
@@ -32,6 +36,9 @@ export default function UsersDashboard() {
 
     useEffect(() => {
         fetchUserData();
+        if (!session?.user) {
+            router.push("/");
+        };
     }, []);
 
     const handleDelete = async (userId: any) => {
@@ -92,6 +99,7 @@ export default function UsersDashboard() {
                     <table className="w-full table-auto text-sm text-center rtl:text-right text-gray-500">
                         <thead className="text-xs text-white bg-blue-400 uppercase">
                             <tr>
+                                <th></th>
                                 <th scope="col" className="min-[320px]:px-4 md:px-6 py-5">
                                     Name
                                 </th>
@@ -123,8 +131,17 @@ export default function UsersDashboard() {
                             <tbody>
                                 {userData.map((data) => (
                                     <tr key={data.id} className="bg-white border-b hover:bg-blue-100">
+                                        <td className="min-[320px]:pl-4 md:pl-6 py-4 cursor-pointer">
+                                            <Image
+                                                src={data.avatar ? data.avatar : "/user/avatar_default.jpg"}
+                                                width={32}
+                                                height={32}
+                                                alt={data.name || ""}
+                                                className="rounded-full"
+                                            />
+                                        </td>
                                         <td
-                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer"
+                                            className="min-[320px]:pr-4 md:pr-6 py-4 cursor-pointer"
                                         >
                                             {data.name}
                                         </td>
@@ -149,7 +166,7 @@ export default function UsersDashboard() {
                                             {data.address}
                                         </td>
                                         <td>
-                                            <Link href={`/dashboard/users/edit-${data.id}`} className="justify-center items-center flex gap-2 py-2 px-4 rounded-lg text-white bg-blue-400">
+                                            <Link href={`/dashboard/users/edit/${data.id}`} className="justify-center items-center flex gap-2 py-2 px-4 rounded-lg text-white bg-blue-400">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                                                     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                                                     <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>

@@ -2,9 +2,15 @@
 const nextConfig = {
     reactStrictMode: false,
     swcMinify: true,
-    images:{
-        domains:['firebasestorage.googleapis.com']
-    }
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'firebasestorage.googleapis.com',
+                pathname: '**',
+            },
+        ],
+    },
 }
 
 module.exports = nextConfig

@@ -42,7 +42,7 @@ export default function DashboardContainer({ children }: PageContainerProps) {
     useEffect(() => {
         if ((session?.user as any)?.is_admin === 'client') {
             router.push("/");
-        }
+        };
     }, [session, router]);
 
     const handleSignOut = async () => {
@@ -51,7 +51,7 @@ export default function DashboardContainer({ children }: PageContainerProps) {
     };
 
     return (
-        <>
+        <div>
             <button
                 onClick={handleSidebarToggle}
                 data-drawer-target="sidebar-multi-level-sidebar"
@@ -183,6 +183,6 @@ export default function DashboardContainer({ children }: PageContainerProps) {
             <div className="sm:ml-64">
                 {children}
             </div>
-        </>
+        </div>
     )
 }
