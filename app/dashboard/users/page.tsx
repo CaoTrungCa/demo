@@ -14,6 +14,7 @@ export default function UsersDashboard() {
 
     const [isDelete, setIsDelete] = useState(false);
     const [idDelete, setIdDelete] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
 
     const router = useRouter();
 
@@ -54,6 +55,18 @@ export default function UsersDashboard() {
         }
     }
 
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
+    let filteredData = userData;
+
+    if (searchTerm !== '') {
+        filteredData = userData.filter((user) =>
+            user.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+
     return (
         <DashboardContainer>
             <div className="h-10 w-full items-center flex p-8 gap-4 text-sm">
@@ -77,6 +90,8 @@ export default function UsersDashboard() {
                     <input
                         type="text"
                         placeholder="Search by name..."
+                        value={searchTerm}
+                        onChange={handleSearch}
                         className="px-3 py-2 my-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-400 w-full md:w-auto"
                     />
                     <Link href="/dashboard/users/create">
@@ -94,7 +109,7 @@ export default function UsersDashboard() {
                         <thead className="text-xs text-white bg-blue-400 uppercase">
                             <tr>
                                 <th></th>
-                                <th scope="col" className="min-[320px]:px-4 md:px-6 py-5">
+                                <th scope="col" className="min-[320px]:pr-4 md:pr-6 py-5">
                                     Name
                                 </th>
                                 <th scope="col" className="min-[320px]:px-4 md:px-6 py-5 hidden md:table-cell">
@@ -113,7 +128,7 @@ export default function UsersDashboard() {
                                 <th></th>
                             </tr>
                         </thead>
-                        { userData.length === 0 ? (
+                        { filteredData.length === 0 ? (
                             <tbody>
                                 <tr>
                                     <td colSpan={7} className="py-4 text-center">
@@ -123,8 +138,8 @@ export default function UsersDashboard() {
                             </tbody>
                         ) : (
                             <tbody>
-                                {userData.map((data) => (
-                                    <tr key={data.id} className="bg-white border-b hover:bg-blue-100">
+                                {filteredData.map((data, index) => (
+                                    <tr key={index} className="bg-white border-b hover:bg-blue-100">
                                         <td className="min-[320px]:pl-4 md:pl-6 py-4 cursor-pointer">
                                             <Image
                                                 src={data.avatar ? data.avatar : "/user/avatar_default.jpg"}

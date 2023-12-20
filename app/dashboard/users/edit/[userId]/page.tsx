@@ -1,40 +1,71 @@
 'use client'
 import { useEffect, useState } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { collection, doc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from '@/firebase/firebase';
-import { User } from "@/lib/collection";
 import Image from "next/image";
 import DashboardContainer from "@/components/DashboardContainer";
-import { useSession } from "next-auth/react";
 
-export default function EditUser({ params }: { params: any }) {
-    const { data: session } = useSession();
+export default function EditUser() {
     const db = getFirestore(app);
     const storage = getStorage(app);
     const router = useRouter();
-    const [user, setUser] = useState<User[]>([]);
 
-    const fetchUserData = async () => {
-        const q = query(collection(db, 'users'), where("id", "==", params.userId));
-        try {
-            const querySnapshot = await getDocs(q);
-            const userDataArray: any = [];
-            querySnapshot.forEach((doc) => {
-                userDataArray.push(doc.data());
-            });
-            setUser(userDataArray);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+    const [userData, setUserData] = useState({
+        name: "",
+        birthday: "",
+        address: "",
+        email: "",
+        phone: "",
+        username: "",
+        password: "",
+        avatar: "",
+        is_admin: "",
+    });
 
-    const [avatarUrl, setAvatarUrl] = useState("");
     const [userType, setUserType] = useState<string>("client");
+    const [avatarUrl, setAvatarUrl] = useState("");
 
-    const handleUserTypeChange = (type: string) => {
-        setUserType(type);
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const q = query(collection(db, 'users'), where("id", "==", router.query.userId));
+            try {
+                const querySnapshot = await getDocs(q);
+                const userDataArray: any[] = [];
+                querySnapshot.forEach((doc) => {
+                    userDataArray.push(doc.data());
+                });
+
+                if (userDataArray.length > 0) {
+                    const user = userDataArray[0];
+                    setUserData({
+                        name: user.name || "",
+                        birthday: user.birthday || "",
+                        address: user.address || "",
+                        email: user.email || "",
+                        phone: user.phone || "",
+                        username: user.username || "",
+                        password: user.password || "",
+                        avatar: user.avatar || "",
+                        is_admin: user.is_admin || "",
+                    });
+                    setUserType(user.is_admin || "client");
+                    setAvatarUrl(user.avatar || "");
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, [db, router.query.userId]);
+
+    console.log(userData)
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setUserData({ ...userData, [name]: value });
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,30 +76,49 @@ export default function EditUser({ params }: { params: any }) {
                 const id = `file_${Date.now().toString()}`;
                 const fileRef = ref(storage, `user/${id}`);
 
-                uploadBytes(fileRef, file)
-                    .then(() => {
-                        getDownloadURL(fileRef).then(async (downloadURL) => {
-                            await setDoc(doc(db, "files", id), {
-                                name: file.name,
-                                type: file.name.split(".")[1],
-                                size: file.size,
-                                modifiedAt: file.lastModified,
-                                imageUrl: downloadURL,
-                                id: id
-                            });
+                await uploadBytes(fileRef, file);
 
-                            setAvatarUrl(downloadURL);
-                        });
-                    });
+                const downloadURL = await getDownloadURL(fileRef);
+
+                await setDoc(doc(db, "files", id), {
+                    name: file.name,
+                    type: file.name.split(".")[1],
+                    size: file.size,
+                    modifiedAt: file.lastModified,
+                    imageUrl: downloadURL,
+                    id: id
+                });
+
+                setAvatarUrl(downloadURL);
             } catch (error) {
                 console.error("Error uploading file:", error);
             }
         }
     };
 
+    const handleUserTypeChange = (type: string) => {
+        setUserType(type);
+    };
+
     const handleEdit = async () => {
-        console.log("Edit", user)
-    }
+        try {
+            const userRef = doc(db, 'users', params.userId);
+            await setDoc(userRef, {
+                name: userData.name,
+                birthday: userData.birthday,
+                address: userData.address,
+                email: userData.email,
+                phone: userData.phone,
+                username: userData.username,
+                password: userData.password,
+                avatar: avatarUrl,
+                is_admin: userType,
+            });
+            router.push('/dashboard/users');
+        } catch (error) {
+            console.error('Error updating user data:', error);
+        }
+    };
 
     return (
         <DashboardContainer>
@@ -93,22 +143,28 @@ export default function EditUser({ params }: { params: any }) {
                     <div className="flex items-center w-full justify-center border-b">
                         <div className="m-4 p-4 mx-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded">
                             <div className="p-2">
+                                <Image width={128} height={128} className="w-32 h-32 rounded-full mx-auto" src={avatarUrl ? avatarUrl : "/user/avatar_default.jpg"} alt=""/>
                             </div>
                             <div className="p-2">
                                 <h3 className="text-center text-2xl text-gray-900 font-medium leading-8">
+                                    {userData.name}
                                 </h3>
                                 <div className="text-center text-gray-400 text-base font-semibold">
+                                    <p>{userData.birthday}</p>
                                 </div>
                                 <table className="text-base my-3">
                                     <tbody>
                                         <tr>
                                             <td className="px-2 py-2 text-gray-500 font-semibold">Address</td>
+                                            <td className="px-2 py-2">{userData.address}</td>
                                         </tr>
                                         <tr>
                                             <td className="px-2 py-2 text-gray-500 font-semibold">Phone</td>
+                                            <td className="px-2 py-2">{userData.phone}</td>
                                         </tr>
                                         <tr>
                                             <td className="px-2 py-2 text-gray-500 font-semibold">Email</td>
+                                            <td className="px-2 py-2">{userData.email}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -116,7 +172,7 @@ export default function EditUser({ params }: { params: any }) {
                         </div>
                     </div>
                 </div>
-                <form className="md:col-span-2 shadow-lg rounded-lg p-6" onSubmit={handleEdit}>
+                <form className="md:col-span-2 shadow-lg rounded-lg p-6">
                     <div className="h-32 w-32 justify-center items-center mx-auto">
                         <label>
                             <input
@@ -127,7 +183,17 @@ export default function EditUser({ params }: { params: any }) {
                                 onChange={(e) => handleFileChange(e)}
                             />
                             <div className="aspect-video rounded flex items-center justify-center border-2 border-dashed cursor-pointer">
-                                <span>Select Avatar</span>
+                                {avatarUrl ? (
+                                    <Image
+                                        src={avatarUrl}
+                                        width={100}
+                                        height={100}
+                                        alt={userData.avatar}
+                                        className="w-32 h-32 rounded-full"
+                                    />
+                                ) : (
+                                    <span>Select Avatar</span>
+                                )}
                             </div>
                         </label>
                     </div>
@@ -139,6 +205,8 @@ export default function EditUser({ params }: { params: any }) {
                                 id="name"
                                 name="name"
                                 placeholder="Admin"
+                                value={userData.name}
+                                onChange={handleInputChange}
                                 className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                             />
                         </div>
@@ -149,6 +217,8 @@ export default function EditUser({ params }: { params: any }) {
                                 id="birthday"
                                 name="birthday"
                                 placeholder="01-01-2000"
+                                value={userData.birthday}
+                                onChange={handleInputChange}
                                 className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                             />
                         </div>
@@ -160,6 +230,8 @@ export default function EditUser({ params }: { params: any }) {
                             id="address"
                             name="address"
                             placeholder="Hải Phòng"
+                            value={userData.address}
+                            onChange={handleInputChange}
                             className="w-full pl-4  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                         />
                     </div>
@@ -171,6 +243,8 @@ export default function EditUser({ params }: { params: any }) {
                                 id="email"
                                 name="email"
                                 placeholder="admin@gmail.com"
+                                value={userData.email}
+                                onChange={handleInputChange}
                                 className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                             />
                         </div>
@@ -181,6 +255,8 @@ export default function EditUser({ params }: { params: any }) {
                                 id="phone"
                                 name="phone"
                                 placeholder="0123456789"
+                                value={userData.phone}
+                                onChange={handleInputChange}
                                 className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                             />
                         </div>
@@ -193,6 +269,8 @@ export default function EditUser({ params }: { params: any }) {
                                 id="username"
                                 name="username"
                                 placeholder="admin"
+                                value={userData.username}
+                                onChange={handleInputChange}
                                 className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                             />
                         </div>
@@ -203,6 +281,8 @@ export default function EditUser({ params }: { params: any }) {
                                 id="password"
                                 name="password"
                                 placeholder="admin"
+                                value={userData.password}
+                                onChange={handleInputChange}
                                 className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                             />
                         </div>
@@ -229,7 +309,7 @@ export default function EditUser({ params }: { params: any }) {
                         </div>
                     </div>
                     <div className="mt-4 py-4 flex">
-                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 mr-2 rounded-lg">
+                        <button type="button" onClick={handleEdit} className="bg-blue-500 text-white px-4 py-2 mr-2 rounded-lg">
                             Save
                         </button>
                         <div className="w-4"></div>

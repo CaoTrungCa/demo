@@ -1,7 +1,6 @@
 'use client'
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { redirect, useRouter } from 'next/navigation';
 import { doc, getFirestore, setDoc } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from '@/firebase/firebase';
@@ -10,7 +9,6 @@ import Image from "next/image";
 import DashboardContainer from "@/components/DashboardContainer";
 
 export default function CreateUser() {
-    const { data: session } = useSession();
     const db = getFirestore(app);
     const storage = getStorage(app);
     const router = useRouter();
@@ -72,14 +70,14 @@ export default function CreateUser() {
         }
     };
 
-    const handleSave = async () => {
+    const handleCreate = async () => {
         try {
             const id = `user_${Date.now().toString()}`;
             const createDate = new Date(Date.now()).toUTCString();
             await setDoc(doc(db, 'users', id), {
                 ...user,
-                id,
-                createDate,
+                id: id,
+                createDate: createDate,
                 avatar: avatarUrl || "",
                 is_admin: userType,
             });
@@ -139,7 +137,7 @@ export default function CreateUser() {
                         </div>
                     </div>
                 </div>
-                <form className="md:col-span-2 shadow-lg rounded-lg p-6" onSubmit={handleSave}>
+                <form className="md:col-span-2 shadow-lg rounded-lg p-6">
                     <div className="h-32 w-32 justify-center items-center mx-auto">
                         <label>
                             <input
@@ -276,7 +274,7 @@ export default function CreateUser() {
                         </div>
                     </div>
                     <div className="mt-4 py-4 flex">
-                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 mr-2 rounded-lg">
+                        <button type="button" onClick={handleCreate} className="bg-blue-500 text-white px-4 py-2 mr-2 rounded-lg">
                             Save
                         </button>
                         <div className="w-4"></div>

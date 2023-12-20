@@ -1,9 +1,10 @@
 'use client'
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter, redirect } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 interface PageContainerProps {
     className?: string
@@ -148,7 +149,7 @@ export default function DashboardContainer({ children }: PageContainerProps) {
                             </li>
                         </ul>
                     </div>
-                    <div className="mt-auto border-t">
+                    <div className="mt-auto">
                         <ul className="space-y-2 font-medium">
                             <li onClick={handleSignOut}>
                                 <div
@@ -171,6 +172,11 @@ export default function DashboardContainer({ children }: PageContainerProps) {
                                     </svg>
                                     <span className="flex-1 ms-3 whitespace-nowrap">Log out</span>
                                 </div>
+                            </li>
+                            <li className="border-t py-3">
+                                <span className="block text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2023
+                                    <Link href="/" className="hover:underline"> Cao Trung</Link>
+                                </span>
                             </li>
                         </ul>
                     </div>
