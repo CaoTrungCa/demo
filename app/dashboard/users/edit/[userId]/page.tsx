@@ -7,7 +7,7 @@ import { app } from '@/firebase/firebase';
 import Image from "next/image";
 import DashboardContainer from "@/components/DashboardContainer";
 
-export default function EditUser() {
+export default function EditUser({ params }: { params: any }) {
     const db = getFirestore(app);
     const storage = getStorage(app);
     const router = useRouter();
