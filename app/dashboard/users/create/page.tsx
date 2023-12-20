@@ -11,16 +11,9 @@ import DashboardContainer from "@/components/DashboardContainer";
 
 export default function CreateUser() {
     const { data: session } = useSession();
-
     const db = getFirestore(app);
     const storage = getStorage(app);
     const router = useRouter();
-
-    useEffect(() => {
-        if (!session?.user) {
-            router.push("/");
-        };
-    }, []);
 
     const [user, setUser] = useState<User>({
         create_date: "",
@@ -90,7 +83,7 @@ export default function CreateUser() {
                 avatar: avatarUrl || "",
                 is_admin: userType,
             });
-            return router.push("/dashboard/users");
+            router.push("/dashboard/users");
         } catch (error) {
             console.error("Error saving profile:", error);
         }

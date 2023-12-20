@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { collection, doc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from '@/firebase/firebase';
@@ -11,7 +11,6 @@ import { useSession } from "next-auth/react";
 
 export default function EditUser({ params }: { params: any }) {
     const { data: session } = useSession();
-
     const db = getFirestore(app);
     const storage = getStorage(app);
     const router = useRouter();
@@ -31,17 +30,44 @@ export default function EditUser({ params }: { params: any }) {
         }
     };
 
-    useEffect(() => {
-        fetchUserData();
-        if (!session?.user) {
-            router.push("/");
-        };
-    }, []);
+    const [avatarUrl, setAvatarUrl] = useState("");
+    const [userType, setUserType] = useState<string>("client");
 
-    console.log(user)
+    const handleUserTypeChange = (type: string) => {
+        setUserType(type);
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = (e.target.files as FileList)[0];
+
+        if (file) {
+            try {
+                const id = `file_${Date.now().toString()}`;
+                const fileRef = ref(storage, `user/${id}`);
+
+                uploadBytes(fileRef, file)
+                    .then(() => {
+                        getDownloadURL(fileRef).then(async (downloadURL) => {
+                            await setDoc(doc(db, "files", id), {
+                                name: file.name,
+                                type: file.name.split(".")[1],
+                                size: file.size,
+                                modifiedAt: file.lastModified,
+                                imageUrl: downloadURL,
+                                id: id
+                            });
+
+                            setAvatarUrl(downloadURL);
+                        });
+                    });
+            } catch (error) {
+                console.error("Error uploading file:", error);
+            }
+        }
+    };
 
     const handleEdit = async () => {
-        console.log("Edit", user[0])
+        console.log("Edit", user)
     }
 
     return (
@@ -67,28 +93,22 @@ export default function EditUser({ params }: { params: any }) {
                     <div className="flex items-center w-full justify-center border-b">
                         <div className="m-4 p-4 mx-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded">
                             <div className="p-2">
-                                {/* <Image width={128} height={128} className="w-32 h-32 rounded-full mx-auto" src={user[0].avatar ? user[0].avatar : "/user/avatar_default.jpg"} alt=""/> */}
                             </div>
                             <div className="p-2">
                                 <h3 className="text-center text-2xl text-gray-900 font-medium leading-8">
-                                    {/* {user[0].name} */}
                                 </h3>
                                 <div className="text-center text-gray-400 text-base font-semibold">
-                                    {/* <p>{user[0].birthday}</p> */}
                                 </div>
                                 <table className="text-base my-3">
                                     <tbody>
                                         <tr>
                                             <td className="px-2 py-2 text-gray-500 font-semibold">Address</td>
-                                            {/* <td className="px-2 py-2">{user[0].address}</td> */}
                                         </tr>
                                         <tr>
                                             <td className="px-2 py-2 text-gray-500 font-semibold">Phone</td>
-                                            {/* <td className="px-2 py-2">{user[0].phone}</td> */}
                                         </tr>
                                         <tr>
                                             <td className="px-2 py-2 text-gray-500 font-semibold">Email</td>
-                                            {/* <td className="px-2 py-2">{user[0].email}</td> */}
                                         </tr>
                                     </tbody>
                                 </table>
@@ -104,19 +124,10 @@ export default function EditUser({ params }: { params: any }) {
                                 type="file"
                                 id="avatar"
                                 name="avatar"
+                                onChange={(e) => handleFileChange(e)}
                             />
                             <div className="aspect-video rounded flex items-center justify-center border-2 border-dashed cursor-pointer">
-                                {/* {user.avatar ? (
-                                    <Image
-                                        src={user.avatar}
-                                        width={100}
-                                        height={100}
-                                        alt={user.avatar}
-                                        className="w-32 h-32 rounded-full"
-                                    />
-                                ) : ( */}
-                                    <span>Select Avatar</span>
-                                {/* )} */}
+                                <span>Select Avatar</span>
                             </div>
                         </label>
                     </div>
@@ -201,14 +212,14 @@ export default function EditUser({ params }: { params: any }) {
                             <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white mr-2">User Type</label>
                             <div className="flex gap-x-2 text-sm">
                                 <span
-                                    // className={`cursor-pointer px-3 py-1 rounded-lg ${userType === "admin" ? "bg-blue-500 text-white" : ""}`}
-                                    // onClick={() => handleUserTypeChange("admin")}
+                                    className={`cursor-pointer px-3 py-1 rounded-lg ${userType === "admin" ? "bg-blue-500 text-white" : ""}`}
+                                    onClick={() => handleUserTypeChange("admin")}
                                 >
                                     Admin
                                 </span>
                                 <span
-                                    // className={`cursor-pointer px-3 py-1 rounded-lg ${userType === "client" ? "bg-blue-500 text-white" : ""}`}
-                                    // onClick={() => handleUserTypeChange("client")}
+                                    className={`cursor-pointer px-3 py-1 rounded-lg ${userType === "client" ? "bg-blue-500 text-white" : ""}`}
+                                    onClick={() => handleUserTypeChange("client")}
                                 >
                                     Client
                                 </span>

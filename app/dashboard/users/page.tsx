@@ -7,11 +7,8 @@ import DashboardContainer from "@/components/DashboardContainer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
 
 export default function UsersDashboard() {
-    const { data: session } = useSession();
-
     const db = getFirestore(app);
     const [userData, setUserData] = useState<User[]>([]);
 
@@ -36,9 +33,6 @@ export default function UsersDashboard() {
 
     useEffect(() => {
         fetchUserData();
-        if (!session?.user) {
-            router.push("/");
-        };
     }, []);
 
     const handleDelete = async (userId: any) => {

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import Image from "next/image";
 
 interface PageContainerProps {
@@ -39,19 +39,15 @@ export default function DashboardContainer({ children }: PageContainerProps) {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
-    useEffect(() => {
-        if ((session?.user as any)?.is_admin === 'client') {
-            router.push("/");
-        };
-    }, [session, router]);
+    if (!session || (session?.user as any)?.is_admin === 'client') redirect("/");
 
     const handleSignOut = async () => {
         await signOut();
-        router.push('/');
     };
 
     return (
         <div>
+            {session?.user && (<>
             <button
                 onClick={handleSidebarToggle}
                 data-drawer-target="sidebar-multi-level-sidebar"
@@ -183,6 +179,7 @@ export default function DashboardContainer({ children }: PageContainerProps) {
             <div className="sm:ml-64">
                 {children}
             </div>
+            </>)}
         </div>
     )
 }
