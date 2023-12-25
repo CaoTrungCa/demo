@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
-import { useRouter } from 'next/router';
-import { collection, doc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
+import { collection, deleteDoc, doc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from '@/firebase/firebase';
 import Image from "next/image";
@@ -11,6 +11,54 @@ export default function EditUser({ params }: { params: any }) {
     const db = getFirestore(app);
     const storage = getStorage(app);
     const router = useRouter();
+
+    const [defaultUserData, setDefaultUserData] = useState({
+        name: "",
+        birthday: "",
+        address: "",
+        email: "",
+        phone: "",
+        username: "",
+        password: "",
+        avatar: "",
+        is_admin: "",
+        create_date: ""
+    });
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const q = query(collection(db, 'users'), where("id", "==", params.userId));
+            try {
+                const querySnapshot = await getDocs(q);
+                const userDataArray: any[] = [];
+                querySnapshot.forEach((doc) => {
+                    userDataArray.push(doc.data());
+                });
+
+                if (userDataArray.length > 0) {
+                    const user = userDataArray[0];
+                    setDefaultUserData({
+                        name: user.name || "",
+                        birthday: user.birthday || "",
+                        address: user.address || "",
+                        email: user.email || "",
+                        phone: user.phone || "",
+                        username: user.username || "",
+                        password: user.password || "",
+                        avatar: user.avatar || "",
+                        is_admin: user.is_admin || "",
+                        create_date: user.create_date || ""
+                    });
+                    setUserType(user.is_admin || "client");
+                    setAvatarUrl(user.avatar || "");
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, [db, params.userId]);
 
     const [userData, setUserData] = useState({
         name: "",
@@ -22,46 +70,29 @@ export default function EditUser({ params }: { params: any }) {
         password: "",
         avatar: "",
         is_admin: "",
+        create_date: "",
     });
+
+    useEffect(() => {
+        setUserData({
+            name: defaultUserData.name || "",
+            birthday: defaultUserData.birthday || "",
+            address: defaultUserData.address || "",
+            email: defaultUserData.email || "",
+            phone: defaultUserData.phone || "",
+            username: defaultUserData.username || "",
+            password: defaultUserData.password || "",
+            avatar: defaultUserData.avatar || "",
+            is_admin: defaultUserData.is_admin || "",
+            create_date: defaultUserData.create_date || "",
+        });
+    }, [defaultUserData]);
 
     const [userType, setUserType] = useState<string>("client");
     const [avatarUrl, setAvatarUrl] = useState("");
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            const q = query(collection(db, 'users'), where("id", "==", router.query.userId));
-            try {
-                const querySnapshot = await getDocs(q);
-                const userDataArray: any[] = [];
-                querySnapshot.forEach((doc) => {
-                    userDataArray.push(doc.data());
-                });
-
-                if (userDataArray.length > 0) {
-                    const user = userDataArray[0];
-                    setUserData({
-                        name: user.name || "",
-                        birthday: user.birthday || "",
-                        address: user.address || "",
-                        email: user.email || "",
-                        phone: user.phone || "",
-                        username: user.username || "",
-                        password: user.password || "",
-                        avatar: user.avatar || "",
-                        is_admin: user.is_admin || "",
-                    });
-                    setUserType(user.is_admin || "client");
-                    setAvatarUrl(user.avatar || "");
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchUserData();
-    }, [db, router.query.userId]);
-
-    console.log(userData)
+    const [isDelete, setIsDelete] = useState(false);
+    const [idDelete, setIdDelete] = useState("");
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -102,8 +133,8 @@ export default function EditUser({ params }: { params: any }) {
 
     const handleEdit = async () => {
         try {
-            const userRef = doc(db, 'users', params.userId);
-            await setDoc(userRef, {
+            await setDoc(doc(db, 'users', params.userId), {
+                id: params.userId,
                 name: userData.name,
                 birthday: userData.birthday,
                 address: userData.address,
@@ -113,12 +144,32 @@ export default function EditUser({ params }: { params: any }) {
                 password: userData.password,
                 avatar: avatarUrl,
                 is_admin: userType,
+                create_date: userData.create_date,
             });
             router.push('/dashboard/users');
         } catch (error) {
             console.error('Error updating user data:', error);
         }
     };
+
+    const handleDelete = async (userId: any) => {
+        setIsDelete(!isDelete);
+        setIdDelete(userId);
+    }
+
+    const cancelDelete = () => {
+        setIsDelete(!isDelete);
+    }
+
+    const confirmDelete = async () => {
+        try {
+            await deleteDoc(doc(db, 'users', idDelete));
+            setIsDelete(!isDelete);
+            router.push('/dashboard/users');
+        } catch (error) {
+            console.error('Error deleting data:', error);
+        }
+    }
 
     return (
         <DashboardContainer>
@@ -170,6 +221,16 @@ export default function EditUser({ params }: { params: any }) {
                                 </table>
                             </div>
                         </div>
+                    </div>
+                    <div className="text-center my-3">
+                        <button className="justify-center items-center flex gap-2 w-full py-2 px-4 rounded-lg text-white bg-red-400"
+                            onClick={() => handleDelete(params.userId)}
+                            >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash3" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                            </svg>
+                            Delete User
+                        </button>
                     </div>
                 </div>
                 <form className="md:col-span-2 shadow-lg rounded-lg p-6">
@@ -319,6 +380,24 @@ export default function EditUser({ params }: { params: any }) {
                     </div>
                 </form>
             </div>
+            {isDelete &&
+                <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg p-8 w-1/3">
+                        <h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
+                        <p className="mb-6">Are you sure you want to delete this user?</p>
+                        <div className="flex justify-end">
+                        <button onClick={() => cancelDelete()}
+                            className="bg-gray-300 px-4 py-2 rounded-lg mr-2" >
+                            Cancel
+                        </button>
+                        <button onClick={() => confirmDelete()}
+                            className="bg-red-500 text-white px-4 py-2 rounded-lg" >
+                            Delete
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            }
         </DashboardContainer>
     )
 }

@@ -77,7 +77,7 @@ export default function CreateUser() {
             await setDoc(doc(db, 'users', id), {
                 ...user,
                 id: id,
-                createDate: createDate,
+                create_date: createDate,
                 avatar: avatarUrl || "",
                 is_admin: userType,
             });
