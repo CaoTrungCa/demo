@@ -2,25 +2,12 @@
 'use client'
 import DashboardContainer from "@/components/DashboardContainer";
 import { app } from "@/firebase/firebase";
-import { collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, getFirestore, query, setDoc } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
-interface Setting {
-    create_date: string
-    id: string
-    logo: string
-    web_name: string
-    address: string
-    phone: string
-    email: string
-    link_facebook: string
-    link_tiktok: string
-    link_github: string
-    link_youtube: string
-}
+import { Setting } from "@/lib/collection";
 
 export default function SettingDashboard() {
     const db = getFirestore(app);
@@ -49,11 +36,11 @@ export default function SettingDashboard() {
             const q = query(collection(db, 'settings'));
             try {
                 const querySnapshot = await getDocs(q);
-                const userDataArray: any = [];
+                const settingDataArray: any = [];
                 querySnapshot.forEach((doc) => {
-                    userDataArray.push(doc.data());
+                    settingDataArray.push(doc.data());
                 });
-                setSettingData(userDataArray[0]);
+                setSettingData(settingDataArray[0]);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
