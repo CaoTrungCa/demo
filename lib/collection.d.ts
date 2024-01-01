@@ -25,3 +25,22 @@ export interface Setting {
     link_github: string
     link_youtube: string
 }
+
+export interface Post {
+    id: string
+    title: string
+    slug: string
+    status: string
+    categories: string
+    image: string
+    content: string
+    user_created: string
+    date_created: string
+    user_updated: string
+    date_updated: string
+}
+
+export interface Categories {
+    id: string
+    title: string
+}

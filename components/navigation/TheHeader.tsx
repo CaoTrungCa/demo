@@ -6,7 +6,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Setting } from '@/lib/collection';
 
-export default function TheHeader({data}: {data: Setting}) {
+export default function TheHeader({ data }: { data: Setting }) {
   const { data: session } = useSession();
 
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -60,9 +60,8 @@ export default function TheHeader({data}: {data: Setting}) {
                   />
                 </button>
                 <div
-                  className={`absolute right-0 mt-2 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow top-full w-52 ${
-                    isMobileMenuUserOpen ? 'block' : 'hidden'
-                  }`}
+                  className={`absolute right-0 mt-2 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow top-full w-52 ${isMobileMenuUserOpen ? 'block' : 'hidden'
+                    }`}
                   id="user-dropdown"
                 >
                   <div className="px-4 py-3">
@@ -80,7 +79,7 @@ export default function TheHeader({data}: {data: Setting}) {
                         <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                           Dashboard
                         </Link>
-                      : null }
+                        : null}
                     </li>
                     <li>
                       <p onClick={handleSignOut} className="block hover:cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">

@@ -45,7 +45,7 @@ export default function Register () {
                 email,
                 username,
                 password,
-                createDate,
+                create_date: createDate,
                 is_admin: 'client'
             });
             e.target.reset();
