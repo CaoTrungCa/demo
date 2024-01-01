@@ -2,15 +2,14 @@
 import { useState, useEffect } from "react";
 import { collection, deleteDoc, getDocs, getFirestore, query, doc } from "firebase/firestore";
 import { app } from '@/firebase/firebase';
-import { Post } from "@/lib/collection";
+import { Categories } from "@/lib/collection";
 import DashboardContainer from "@/components/DashboardContainer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 export default function PostsDashboard() {
     const db = getFirestore(app);
-    const [postData, setPostData] = useState<Post[]>([]);
+    const [categoriesData, setCategoriesData] = useState<Categories[]>([]);
 
     const [isDelete, setIsDelete] = useState(false);
     const [idDelete, setIdDelete] = useState("");
@@ -18,27 +17,27 @@ export default function PostsDashboard() {
 
     const router = useRouter();
 
-    const fetchPostData = async () => {
-        const q = query(collection(db, 'posts'));
+    const fetchCategoriesData = async () => {
+        const q = query(collection(db, 'categories'));
         try {
             const querySnapshot = await getDocs(q);
-            const postDataArray: any = [];
+            const categoriesDataArray: any = [];
             querySnapshot.forEach((doc) => {
-                postDataArray.push(doc.data());
+                categoriesDataArray.push(doc.data());
             });
-            setPostData(postDataArray);
+            setCategoriesData(categoriesDataArray);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
 
     useEffect(() => {
-        fetchPostData();
+        fetchCategoriesData();
     }, []);
 
-    const handleDelete = async (postId: any) => {
+    const handleDelete = async (categoriesId: any) => {
         setIsDelete(!isDelete);
-        setIdDelete(postId);
+        setIdDelete(categoriesId);
     }
 
     const cancelDelete = () => {
@@ -47,9 +46,9 @@ export default function PostsDashboard() {
 
     const confirmDelete = async () => {
         try {
-            await deleteDoc(doc(db, 'posts', idDelete));
+            await deleteDoc(doc(db, 'categories', idDelete));
             setIsDelete(!isDelete);
-            fetchPostData();
+            fetchCategoriesData();
         } catch (error) {
             console.error('Error deleting data:', error);
         }
@@ -59,11 +58,11 @@ export default function PostsDashboard() {
         setSearchTerm(event.target.value);
     };
 
-    let filteredData = postData;
+    let filteredData = categoriesData;
 
     if (searchTerm !== '') {
-        filteredData = postData.filter((post) =>
-            post.title.toLowerCase().includes(searchTerm.toLowerCase())
+        filteredData = categoriesData.filter((categories) =>
+            categories.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }
 
@@ -96,7 +95,7 @@ export default function PostsDashboard() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-right" viewBox="0 0 16 16">
                     <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
                 </svg>
-                <p className="text-gray-400">Post</p>
+                <p className="text-gray-400">Categories</p>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-right" viewBox="0 0 16 16">
                     <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
                 </svg>
@@ -106,12 +105,12 @@ export default function PostsDashboard() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between my-4">
                     <input
                         type="text"
-                        placeholder="Search by title..."
+                        placeholder="Search by categories..."
                         value={searchTerm}
                         onChange={handleSearch}
                         className="px-3 py-2 my-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-400 w-full md:w-auto"
                     />
-                    <Link href="/dashboard/posts/create">
+                    <Link href="/dashboard/categories/create">
                         <button className="justify-center items-center flex gap-2 py-2 px-4 rounded-lg text-white bg-blue-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
                                 <path fillRule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
@@ -125,16 +124,7 @@ export default function PostsDashboard() {
                         <thead className="text-xs text-white bg-blue-400 uppercase">
                             <tr>
                                 <th scope="col" className="min-[320px]:pr-4 md:pr-6 py-5">
-                                    Category
-                                </th>
-                                <th scope="col" className="min-[320px]:px-4 md:px-6 py-5 hidden md:table-cell">
                                     Title
-                                </th>
-                                <th scope="col" className="min-[320px]:px-4 md:px-6 py-5 hidden md:table-cell">
-                                    Content
-                                </th>
-                                <th scope="col" className="min-[320px]:px-4 md:px-6 py-5 hidden md:table-cell">
-                                    Status
                                 </th>
                                 <th></th>
                                 <th></th>
@@ -155,27 +145,10 @@ export default function PostsDashboard() {
                                         <td
                                             className="min-[320px]:pr-4 md:pr-6 py-4 cursor-pointer"
                                         >
-                                            {data.categories}
-                                        </td>
-                                        <td
-                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer hidden md:table-cell"
-                                        >
                                             {data.title}
                                         </td>
-                                        <td
-                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer hidden md:table-cell"
-                                        >
-                                            {data.content}
-                                        </td>
-                                        <td
-                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer hidden md:table-cell w-20"
-                                        >
-                                            <p className={`p-2 w-16 text-white rounded-lg ${data.status === 'done' ? 'bg-green-400' : data.status === 'draft' ? 'bg-gray-400' : ''}`}>
-                                                {data.status}
-                                            </p>
-                                        </td>
                                         <td className="w-24 pr-4">
-                                            <Link href={`/dashboard/posts/edit/${data.id}`} className="justify-center items-center flex gap-2 py-2 px-4 rounded-lg text-white bg-blue-400 w-24 h-8">
+                                            <Link href={`/dashboard/categories/edit/${data.id}`} className="justify-center items-center flex gap-2 py-2 px-4 rounded-lg text-white bg-blue-400 w-24 h-8">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                                                     <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                                                     <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
@@ -229,7 +202,7 @@ export default function PostsDashboard() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
                     <div className="bg-white rounded-lg p-8 w-1/3">
                         <h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
-                        <p className="mb-6">Are you sure you want to delete this post?</p>
+                        <p className="mb-6">Are you sure you want to delete this categories?</p>
                         <div className="flex justify-end">
                             <button onClick={() => cancelDelete()}
                                 className="bg-gray-300 px-4 py-2 rounded-lg mr-2" >

@@ -10,9 +10,11 @@ import { useRouter } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
 
 export default function MyProfile() {
-    const { data: session } = useSession();
+    const { data: session, status, update } = useSession();
     const db = getFirestore(app);
     const storage = getStorage(app);
+
+    const router = useRouter();
 
     const [userProfile, setUserProfile] = useState<User>({
         create_date: "",
@@ -28,38 +30,11 @@ export default function MyProfile() {
         is_admin: "",
     });
 
-    const [initialUserProfile, setInitialUserProfile] = useState<User>({ ...userProfile });
     const [isEditing, setIsEditing] = useState(false);
-
-    const router = useRouter();
-
-    const fetchUserProfile = async (username: string) => {
-        try {
-            const querySnapshot = await getDocs(query(collection(db, 'users'), where("username", "==", username)));
-
-            if (!querySnapshot.empty) {
-                const userData = querySnapshot.docs[0].data() as User;
-                return userData;
-            }
-        } catch (error) {
-            console.error("Error fetching user profile:", error);
-        }
-        return null;
-    };
-
-    const fetchUserProfileFromDB = async () => {
-        if ((session?.user as any).username) {
-            const fetchedProfile = await fetchUserProfile((session?.user as any).username);
-            if (fetchedProfile) {
-                setUserProfile(fetchedProfile);
-                setInitialUserProfile({ ...fetchedProfile });
-            }
-        }
-    };
 
     useEffect(() => {
         if (session) {
-            fetchUserProfileFromDB();
+            setUserProfile((session as any).user);
         } else {
             router.push("/auth/login");
         }
@@ -75,23 +50,38 @@ export default function MyProfile() {
 
     const handleEdit = () => {
         setIsEditing(!isEditing);
-        setInitialUserProfile({ ...userProfile });
     };
 
     const handleSave = async () => {
         try {
             await setDoc(doc(db, "users", userProfile.id), {
                 ...userProfile,
+                avatar: userProfile.avatar,
             });
 
-            setIsEditing(!isEditing);
+            await update({
+                id: userProfile.id,
+                create_date: userProfile.create_date,
+                name: userProfile.name,
+                avatar: userProfile.avatar,
+                birthday: userProfile.birthday,
+                address: userProfile.address,
+                email: userProfile.email,
+                phone: userProfile.phone,
+                username: userProfile.username,
+                password: userProfile.password,
+                is_admin: userProfile.is_admin,
+            });
+            setIsEditing(false);
         } catch (error) {
-            console.error("Error saving profile:", error);
+            console.error("Error updating profile:", error);
         }
     };
 
     const handleCancel = () => {
-        setUserProfile({ ...initialUserProfile });
+        if (session) {
+            setUserProfile((session as any).user);
+        }
         setIsEditing(!isEditing);
     };
 
@@ -171,8 +161,8 @@ export default function MyProfile() {
                                             <input
                                                 hidden
                                                 type="file"
-                                                id="background"
-                                                name="background"
+                                                id="avatar"
+                                                name="avatar"
                                                 className="w-full"
                                                 onChange={(e) => handleFileChange(e)}
                                             />
@@ -212,8 +202,8 @@ export default function MyProfile() {
                                         id="name"
                                         placeholder="Admin"
                                         value={userProfile.name}
-                                        onChange={handleInputChange}
                                         readOnly={!isEditing}
+                                        onChange={handleInputChange}
                                         className="border rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300"
                                     />
                                 </div>
@@ -224,8 +214,8 @@ export default function MyProfile() {
                                         name="birthday"
                                         placeholder="04-12-2000"
                                         value={userProfile.birthday}
-                                        onChange={handleInputChange}
                                         readOnly={!isEditing}
+                                        onChange={handleInputChange}
                                         className="border rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300"
                                     />
                                 </div>
@@ -238,8 +228,8 @@ export default function MyProfile() {
                                 name="address"
                                 placeholder="Hải Phòng"
                                 value={userProfile.address}
-                                onChange={handleInputChange}
                                 readOnly={!isEditing}
+                                onChange={handleInputChange}
                                 className="border rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>
@@ -251,8 +241,8 @@ export default function MyProfile() {
                                     name="email"
                                     placeholder="admin@gmail.com"
                                     value={userProfile.email}
-                                    onChange={handleInputChange}
                                     readOnly={!isEditing}
+                                    onChange={handleInputChange}
                                     className="border rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300"
                                 />
                             </div>
@@ -263,8 +253,8 @@ export default function MyProfile() {
                                     name="phone"
                                     placeholder="0123456789"
                                     value={userProfile.phone}
-                                    onChange={handleInputChange}
                                     readOnly={!isEditing}
+                                    onChange={handleInputChange}
                                     className="border rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300"
                                 />
                             </div>
@@ -277,8 +267,8 @@ export default function MyProfile() {
                                     name="username"
                                     placeholder="admin"
                                     value={userProfile.username}
-                                    onChange={handleInputChange}
                                     readOnly={!isEditing}
+                                    onChange={handleInputChange}
                                     className="border rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300"
                                 />
                             </div>
@@ -289,8 +279,8 @@ export default function MyProfile() {
                                     name="password"
                                     placeholder=""
                                     value={userProfile.password}
-                                    onChange={handleInputChange}
                                     readOnly={!isEditing}
+                                    onChange={handleInputChange}
                                     className="border rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300"
                                 />
                             </div>
