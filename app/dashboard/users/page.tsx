@@ -76,7 +76,10 @@ export default function UsersDashboard() {
     const totalPages = Math.ceil(filteredData.length / perPage);
 
     const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(filteredData.length / perPage); i++) {
+    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+        if(i < 1) continue;
+        if(i > totalPages) break;
+
         pageNumbers.push(i);
     }
 
@@ -125,7 +128,7 @@ export default function UsersDashboard() {
                         <thead className="text-xs text-white bg-blue-400 uppercase">
                             <tr>
                                 <th></th>
-                                <th scope="col" className="min-[320px]:pr-4 md:pr-6 py-5">
+                                <th scope="col" className="min-[320px]:px-4 md:px-6 py-5">
                                     Name
                                 </th>
                                 <th scope="col" className="min-[320px]:px-4 md:px-6 py-5 hidden md:table-cell">
@@ -156,7 +159,7 @@ export default function UsersDashboard() {
                             <tbody>
                                 {currentData.map((data, index) => (
                                     <tr key={index} className="bg-white border-b hover:bg-blue-100">
-                                        <td className="min-[320px]:pl-4 md:pl-6 py-4 cursor-pointer">
+                                        <td className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer">
                                             <Image
                                                 src={data.avatar ? data.avatar : "/user/avatar_default.jpg"}
                                                 width={32}
@@ -166,7 +169,7 @@ export default function UsersDashboard() {
                                             />
                                         </td>
                                         <td
-                                            className="min-[320px]:pr-4 md:pr-6 py-4 cursor-pointer"
+                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer"
                                         >
                                             {data.name}
                                         </td>
@@ -218,14 +221,14 @@ export default function UsersDashboard() {
                             {
                                 currentPage - 1 >= 1 && (
                                     <button onClick={() => handlePageChange(1)}
-                                        className='h-9 w-9 mr-2 border border-blue-gray-200 rounded-full'>
+                                        className='h-9 w-9 mr-2 shadow-md border border-blue-gray-200 rounded-full'>
                                     {"«"}</button>
                                 )
                             }
                             {pageNumbers.map((number) => (
                                 <button
                                     key={number} onClick={() => handlePageChange(number)}
-                                    className={`mr-2 ${number == currentPage
+                                    className={`mr-2 shadow-md ${number == currentPage
                                         ? 'h-9 w-9 bg-blue-400 text-white rounded-full'
                                         : 'h-9 w-9 border border-blue-gray-200 rounded-full'}`}>
                                 {number}</button>
@@ -233,7 +236,7 @@ export default function UsersDashboard() {
                             {
                                 currentPage + 1 <= totalPages && (
                                     <button onClick={() => handlePageChange(totalPages)}
-                                        className='h-9 w-9 mr-2 border border-blue-gray-200 rounded-full'>
+                                        className='h-9 w-9 mr-2 shadow-md border border-blue-gray-200 rounded-full'>
                                     {"»"}</button>
                                 )
                             }

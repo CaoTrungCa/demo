@@ -172,7 +172,7 @@ export default function SettingDashboard() {
                                 readOnly={isReadOnly}
                                 value={settingData.web_name}
                                 onChange={(e) => handleInputChange(e)}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                     </div>
@@ -207,7 +207,7 @@ export default function SettingDashboard() {
                                     readOnly={isReadOnly}
                                     value={settingData.email}
                                     onChange={(e) => handleInputChange(e)}
-                                    className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                                 />
                             </div>
                             <div className="md:col-span-1">
@@ -220,7 +220,7 @@ export default function SettingDashboard() {
                                     readOnly={isReadOnly}
                                     value={settingData.phone}
                                     onChange={(e) => handleInputChange(e)}
-                                    className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                                 />
                             </div>
                         </div>
@@ -244,7 +244,7 @@ export default function SettingDashboard() {
                                     readOnly={isReadOnly}
                                     value={settingData.link_facebook}
                                     onChange={(e) => handleInputChange(e)}
-                                    className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                                 />
                             </div>
                             <div className="md:col-span-1">
@@ -257,7 +257,7 @@ export default function SettingDashboard() {
                                     readOnly={isReadOnly}
                                     value={settingData.link_tiktok}
                                     onChange={(e) => handleInputChange(e)}
-                                    className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                                 />
                             </div>
                         </div>
@@ -272,7 +272,7 @@ export default function SettingDashboard() {
                                     readOnly={isReadOnly}
                                     value={settingData.link_github}
                                     onChange={(e) => handleInputChange(e)}
-                                    className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                                 />
                             </div>
                             <div className="md:col-span-1">
@@ -285,7 +285,7 @@ export default function SettingDashboard() {
                                     readOnly={isReadOnly}
                                     value={settingData.link_youtube}
                                     onChange={(e) => handleInputChange(e)}
-                                    className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                                 />
                             </div>
                         </div>

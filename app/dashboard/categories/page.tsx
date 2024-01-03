@@ -75,7 +75,10 @@ export default function PostsDashboard() {
     const totalPages = Math.ceil(filteredData.length / perPage);
 
     const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(filteredData.length / perPage); i++) {
+    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+        if(i < 1) continue;
+        if(i > totalPages) break;
+
         pageNumbers.push(i);
     }
 
@@ -123,14 +126,14 @@ export default function PostsDashboard() {
                     <table className="w-full table-auto text-sm text-center rtl:text-right text-gray-500">
                         <thead className="text-xs text-white bg-blue-400 uppercase">
                             <tr>
-                                <th scope="col" className="min-[320px]:pr-4 md:pr-6 py-5">
+                                <th scope="col" className="min-[320px]:px-4 md:px-6 py-5">
                                     Title
                                 </th>
                                 <th></th>
                                 <th></th>
                             </tr>
                         </thead>
-                        {filteredData.length === 0 ? (
+                        {currentData.length === 0 ? (
                             <tbody>
                                 <tr>
                                     <td colSpan={7} className="py-4 text-center">
@@ -140,10 +143,10 @@ export default function PostsDashboard() {
                             </tbody>
                         ) : (
                             <tbody>
-                                {filteredData.map((data, index) => (
+                                {currentData.map((data, index) => (
                                     <tr key={index} className="bg-white border-b hover:bg-blue-100">
                                         <td
-                                            className="min-[320px]:pr-4 md:pr-6 py-4 cursor-pointer"
+                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer"
                                         >
                                             {data.title}
                                         </td>
@@ -175,14 +178,14 @@ export default function PostsDashboard() {
                             {
                                 currentPage - 1 >= 1 && (
                                     <button onClick={() => handlePageChange(1)}
-                                        className='h-9 w-9 mr-2 border border-blue-gray-200 rounded-full'>
+                                        className='h-9 w-9 mr-2 shadow-md border border-blue-gray-200 rounded-full'>
                                     {"«"}</button>
                                 )
                             }
                             {pageNumbers.map((number) => (
                                 <button
                                     key={number} onClick={() => handlePageChange(number)}
-                                    className={`mr-2 ${number == currentPage
+                                    className={`mr-2 shadow-md ${number == currentPage
                                         ? 'h-9 w-9 bg-blue-400 text-white rounded-full'
                                         : 'h-9 w-9 border border-blue-gray-200 rounded-full'}`}>
                                 {number}</button>
@@ -190,7 +193,7 @@ export default function PostsDashboard() {
                             {
                                 currentPage + 1 <= totalPages && (
                                     <button onClick={() => handlePageChange(totalPages)}
-                                        className='h-9 w-9 mr-2 border border-blue-gray-200 rounded-full'>
+                                        className='h-9 w-9 mr-2 shadow-md border border-blue-gray-200 rounded-full'>
                                     {"»"}</button>
                                 )
                             }

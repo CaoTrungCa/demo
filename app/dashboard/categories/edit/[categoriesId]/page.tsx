@@ -115,7 +115,7 @@ export default function EditCategpries({ params }: { params: any }) {
                             placeholder="Hải Phòng"
                             value={categoriesData.title}
                             onChange={handleInputChange}
-                            className="w-full pl-4  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                            className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                         />
                     </div>
                     <div className="mt-4 py-4 flex gap-4">

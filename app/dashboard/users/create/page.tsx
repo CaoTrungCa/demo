@@ -172,7 +172,7 @@ export default function CreateUser() {
                                 placeholder="Admin"
                                 value={user.name}
                                 onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                         <div className="md:col-span-1">
@@ -184,7 +184,7 @@ export default function CreateUser() {
                                 placeholder="01-01-2000"
                                 value={user.birthday}
                                 onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                     </div>
@@ -197,7 +197,7 @@ export default function CreateUser() {
                             placeholder="Hải Phòng"
                             value={user.address}
                             onChange={handleInputChange}
-                            className="w-full pl-4  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                            className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                         />
                     </div>
                     <div className="gap-4 pt-4 grid md:grid-cols-2">
@@ -210,7 +210,7 @@ export default function CreateUser() {
                                 placeholder="admin@gmail.com"
                                 value={user.email}
                                 onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                         <div className="md:col-span-1">
@@ -222,7 +222,7 @@ export default function CreateUser() {
                                 placeholder="0123456789"
                                 value={user.phone}
                                 onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                     </div>
@@ -236,7 +236,7 @@ export default function CreateUser() {
                                 placeholder="admin"
                                 value={user.username}
                                 onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                         <div className="md:col-span-1">
@@ -248,7 +248,7 @@ export default function CreateUser() {
                                 placeholder="admin"
                                 value={user.password}
                                 onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                     </div>

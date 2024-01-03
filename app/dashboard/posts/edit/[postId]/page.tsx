@@ -73,6 +73,37 @@ export default function EditPost({ params }: { params: any }) {
         user_updated: "",
         date_updated: ""
     });
+    const [isDelete, setIsDelete] = useState(false);
+    const [idDelete, setIdDelete] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
+    const [categories, setCategories] = useState<string[]>([]);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+
+    const toggleStatusDropdown = () => {
+        setIsStatusDropdownOpen(!isStatusDropdownOpen);
+    };
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const handleSelectCategory = (category: string) => {
+        setPostData((prevPost) => ({
+            ...prevPost,
+            categories: category,
+        }));
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const handleStatusChange = (e: any) => {
+        const { value } = e.target;
+        setPostData((prevPost) => ({
+            ...prevPost,
+            status: value,
+        }));
+        setIsStatusDropdownOpen(!isStatusDropdownOpen);
+    };
 
     useEffect(() => {
         setPostData({
@@ -102,11 +133,6 @@ export default function EditPost({ params }: { params: any }) {
 
         fetchCategories();
     }, [db]);
-
-    const [isDelete, setIsDelete] = useState(false);
-    const [idDelete, setIdDelete] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
-    const [categories, setCategories] = useState<string[]>([]);
 
     const slugifyVietnamese = (text: string) => {
         return text
@@ -237,7 +263,7 @@ export default function EditPost({ params }: { params: any }) {
                                 placeholder="Tiêu đề"
                                 value={postData.title}
                                 onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                         <div className="md:col-span-1">
@@ -250,41 +276,63 @@ export default function EditPost({ params }: { params: any }) {
                                 value={postData.slug}
                                 onChange={handleInputChange}
                                 readOnly
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                     </div>
                     <div className="gap-4 pt-4 grid md:grid-cols-2">
-                        <div className="md:col-span-1">
+                        <div className="md:col-span-1 relative">
                             <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Categories</label>
-                            <select
-                                id="categories"
-                                name="categories"
-                                value={postData.categories}
-                                onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
-                            >
-                                <option value="">Select category</option>
-                                {categories.map((category, index) => (
-                                    <option key={index} value={category}>
-                                        {category}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="relative">
+                                <div
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2 cursor-pointer"
+                                    onClick={toggleDropdown}
+                                >
+                                    {postData.categories ? postData.categories : 'Select Category'}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-compact-down absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" viewBox="0 0 16 16">
+                                        <path fillRule="evenodd" d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z"/>
+                                    </svg>
+                                </div>
+                                {isDropdownOpen && (
+                                    <ul className="absolute z-10 mt-2 w-full text-sm bg-white rounded-md shadow-lg">
+                                        <li onClick={() => handleSelectCategory('')} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
+                                            Select Category
+                                        </li>
+                                        {categories.map((category, index) => (
+                                            <li key={index} onClick={() => handleSelectCategory(category)} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
+                                                {category}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
                         </div>
                         <div className="md:col-span-1">
                             <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
-                            <select
-                                id="status"
-                                name="status"
-                                value={postData.status}
-                                onChange={handleInputChange}
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
-                            >
-                                <option value="">Select Status</option>
-                                <option value="draft">Draft</option>
-                                <option value="done">Done</option>
-                            </select>
+                            <div className="relative">
+                                <div
+                                    className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2 cursor-pointer"
+                                    onClick={toggleStatusDropdown}
+                                >
+                                    {postData.status ? postData.status : 'Select Status'}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-compact-down absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" viewBox="0 0 16 16">
+                                        <path fillRule="evenodd" d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z"/>
+                                    </svg>
+                                </div>
+                                {isStatusDropdownOpen && (
+                                    <ul className="absolute z-10 mt-2 w-full text-sm bg-white rounded-md shadow-lg">
+                                        <li onClick={() => handleStatusChange({ target: { value: '' } })} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
+                                            Select Status
+                                        </li>
+                                        <li onClick={() => handleStatusChange({ target: { value: 'Draft' } })} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
+                                            Draft
+                                        </li>
+                                        <li onClick={() => handleStatusChange({ target: { value: 'Done' } })} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
+                                            Done
+                                        </li>
+                                    </ul>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div className="gap-4 pt-4 grid md:grid-cols-2">
@@ -298,7 +346,7 @@ export default function EditPost({ params }: { params: any }) {
                                 value={postData.user_created}
                                 onChange={handleInputChange}
                                 readOnly
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                         <div className="md:col-span-1">
@@ -311,7 +359,7 @@ export default function EditPost({ params }: { params: any }) {
                                 value={postData.date_created}
                                 onChange={handleInputChange}
                                 readOnly
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                     </div>
@@ -326,7 +374,7 @@ export default function EditPost({ params }: { params: any }) {
                                 value={postData.user_updated}
                                 onChange={handleInputChange}
                                 readOnly
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                         <div className="md:col-span-1">
@@ -339,7 +387,7 @@ export default function EditPost({ params }: { params: any }) {
                                 value={postData.date_updated}
                                 onChange={handleInputChange}
                                 readOnly
-                                className="w-full pl-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                     </div>
@@ -375,7 +423,7 @@ export default function EditPost({ params }: { params: any }) {
                             placeholder="Nội dung bài viết"
                             value={postData.content}
                             onChange={handleInputChange}
-                            className="w-full pl-4  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                            className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                         />
                     </div>
                     <div className="mt-4 py-4 flex gap-4">
