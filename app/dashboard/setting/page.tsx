@@ -2,12 +2,13 @@
 'use client'
 import DashboardContainer from "@/components/DashboardContainer";
 import { app } from "@/firebase/firebase";
-import { collection, doc, getDocs, getFirestore, query, setDoc } from "firebase/firestore";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Setting } from "@/lib/collection";
+import { fetchDataSetting } from "@/lib/utils/fetchData";
 
 export default function SettingDashboard() {
     const db = getFirestore(app);
@@ -32,21 +33,12 @@ export default function SettingDashboard() {
     });
 
     useEffect(() => {
-        const fetchSettingData = async () => {
-            const q = query(collection(db, 'settings'));
-            try {
-                const querySnapshot = await getDocs(q);
-                const settingDataArray: any = [];
-                querySnapshot.forEach((doc) => {
-                    settingDataArray.push(doc.data());
-                });
-                setSettingData(settingDataArray[0]);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchSettingData();
-    }, [db])
+        const fetchData = async () => {
+            const data = await fetchDataSetting();
+            setSettingData(data);
+        }
+        fetchData();
+    }, [])
 
     const handleEdit = async () => {
         setIsReadOnly(!isReadOnly);
@@ -72,7 +64,15 @@ export default function SettingDashboard() {
                                 id: id
                             });
 
-                            setLogo(downloadURL);
+                            setSettingData((prevProfile) => ({
+                                ...prevProfile,
+                                logo: downloadURL,
+                            }));
+
+                            await setDoc(doc(db, "settings", settingData.id), {
+                                ...settingData,
+                                logo: downloadURL,
+                            });
                         });
                     });
             } catch (error) {
@@ -91,7 +91,7 @@ export default function SettingDashboard() {
             await setDoc(doc(db, 'settings', settingData.id), {
                 id: settingData.id,
                 create_date: settingData.create_date,
-                logo: logo || "",
+                logo: settingData.logo,
                 web_name: settingData.web_name,
                 address: settingData.address,
                 phone: settingData.phone,
@@ -138,29 +138,41 @@ export default function SettingDashboard() {
                             Global
                         </h1>
                         <div className="h-32 w-32 mt-4 justify-center items-center mx-auto">
-                            <label>
-                                <input
-                                    hidden
-                                    type="file"
-                                    id="logo"
-                                    name="logo"
-                                    onChange={(e) => handleFileChange(e)}
-                                    readOnly={isReadOnly}
-                                />
-                                <div className="aspect-video rounded flex items-center justify-center border-2 border-dashed cursor-pointer">
-                                    {logo ? (
-                                        <Image
-                                            src={logo}
-                                            width={100}
-                                            height={100}
-                                            alt=""
-                                            className="w-32 h-32 rounded-full"
-                                        />
-                                    ) : (
-                                        <span>Select Logo</span>
-                                    )}
+                            {!isReadOnly ? (
+                                <label>
+                                    <input
+                                        hidden
+                                        type="file"
+                                        id="avatar"
+                                        name="avatar"
+                                        className="w-full"
+                                        onChange={(e) => handleFileChange(e)}
+                                    />
+                                    <div className="aspect-video rounded flex items-center justify-center border-2 border-dashed cursor-pointer">
+                                        {settingData.logo ? (
+                                            <Image
+                                                src={settingData.logo}
+                                                width={100}
+                                                height={100}
+                                                alt={settingData.logo}
+                                                className="w-32 h-32 rounded-full"
+                                            />
+                                        ) : (
+                                            <span>Select Logo</span>
+                                        )}
+                                    </div>
+                                </label>
+                            ) : (
+                                <div className="aspect-video rounded flex items-center justify-center border-2 border-dashed">
+                                    <Image
+                                        src={settingData.logo ? settingData.logo : "https://flowbite.com/docs/images/logo.svg"}
+                                        width={100}
+                                        height={100}
+                                        alt={settingData.logo}
+                                        className="w-32 h-32 rounded-full"
+                                    />
                                 </div>
-                            </label>
+                            )}
                         </div>
                         <div className="pt-4">
                             <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Web Name</label>
@@ -193,7 +205,7 @@ export default function SettingDashboard() {
                                 readOnly={isReadOnly}
                                 value={settingData.address}
                                 onChange={(e) => handleInputChange(e)}
-                                className="w-full pl-4  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                             />
                         </div>
                         <div className="gap-4 pt-4 grid md:grid-cols-2">
