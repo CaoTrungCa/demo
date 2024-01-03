@@ -2,9 +2,8 @@
 import TheFooter from '@/components/navigation/TheFooter'
 import TheHeader from '@/components/navigation/TheHeader'
 import React, { useEffect, useState } from 'react'
-import { app } from "@/firebase/firebase";
-import { collection, getDocs, getFirestore, query } from "firebase/firestore";
 import { Setting } from "@/lib/collection";
+import { fetchDataSetting } from '@/lib/utils/fetchData';
 
 interface PageContainerProps {
     className?: string
@@ -12,8 +11,6 @@ interface PageContainerProps {
 }
 
 export default function PageContainer({ children }: PageContainerProps) {
-    const db = getFirestore(app);
-
     const [settingData, setSettingData] = useState<Setting>({
         create_date: "",
         id: "",
@@ -29,26 +26,17 @@ export default function PageContainer({ children }: PageContainerProps) {
     });
 
     useEffect(() => {
-        const fetchSettingData = async () => {
-            const q = query(collection(db, 'settings'));
-            try {
-                const querySnapshot = await getDocs(q);
-                const settingDataArray: any = [];
-                querySnapshot.forEach((doc) => {
-                    settingDataArray.push(doc.data());
-                });
-                setSettingData(settingDataArray[0]);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchSettingData();
-    }, [db])
+        const fetchData = async () => {
+            const data = await fetchDataSetting();
+            setSettingData(data);
+        }
+        fetchData();
+    }, [])
 
     return (
         <div>
             <TheHeader data={settingData}/>
-            <div className='my-12'>
+            <div className='my-12 container mx-auto max-w-7xl px-4 sm:px-6 py-16 lg:px-8 text-center'>
                 {children}
             </div>
             <TheFooter data={settingData}/>

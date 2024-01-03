@@ -1,11 +1,12 @@
 'use client'
 import { useState, useEffect } from "react";
-import { collection, deleteDoc, getDocs, getFirestore, query, doc } from "firebase/firestore";
+import { deleteDoc, getFirestore, doc } from "firebase/firestore";
 import { app } from '@/firebase/firebase';
 import { Categories } from "@/lib/collection";
 import DashboardContainer from "@/components/DashboardContainer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { fetchDataCategories } from "@/lib/utils/fetchData";
 
 export default function PostsDashboard() {
     const db = getFirestore(app);
@@ -17,22 +18,12 @@ export default function PostsDashboard() {
 
     const router = useRouter();
 
-    const fetchCategoriesData = async () => {
-        const q = query(collection(db, 'categories'));
-        try {
-            const querySnapshot = await getDocs(q);
-            const categoriesDataArray: any = [];
-            querySnapshot.forEach((doc) => {
-                categoriesDataArray.push(doc.data());
-            });
-            setCategoriesData(categoriesDataArray);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
-
     useEffect(() => {
-        fetchCategoriesData();
+        const fetchData = async () => {
+            const data = await fetchDataCategories();
+            setCategoriesData(data);
+        }
+        fetchData();
     }, []);
 
     const handleDelete = async (categoriesId: any) => {
@@ -48,7 +39,8 @@ export default function PostsDashboard() {
         try {
             await deleteDoc(doc(db, 'categories', idDelete));
             setIsDelete(!isDelete);
-            fetchCategoriesData();
+            const updatedCategoriesData = await fetchDataCategories();
+            setCategoriesData(updatedCategoriesData);
         } catch (error) {
             console.error('Error deleting data:', error);
         }

@@ -38,7 +38,7 @@ export default function MyProfile() {
         } else {
             router.push("/auth/login");
         }
-    }, [session]);
+    }, [router, session]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;

@@ -1,12 +1,13 @@
 'use client'
 import { useState, useEffect } from "react";
-import { collection, deleteDoc, getDocs, getFirestore, query, doc } from "firebase/firestore";
+import { deleteDoc, getFirestore, doc } from "firebase/firestore";
 import { app } from '@/firebase/firebase';
 import { User } from "@/lib/collection";
 import DashboardContainer from "@/components/DashboardContainer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { fetchDataUser } from "@/lib/utils/fetchData";
 
 export default function UsersDashboard() {
     const db = getFirestore(app);
@@ -18,22 +19,12 @@ export default function UsersDashboard() {
 
     const router = useRouter();
 
-    const fetchUserData = async () => {
-        const q = query(collection(db, 'users'));
-        try {
-            const querySnapshot = await getDocs(q);
-            const userDataArray: any = [];
-            querySnapshot.forEach((doc) => {
-                userDataArray.push(doc.data());
-            });
-            setUserData(userDataArray);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
-
     useEffect(() => {
-        fetchUserData();
+        const fetchData = async () => {
+            const data = await fetchDataUser();
+            setUserData(data);
+        }
+        fetchData();
     }, []);
 
     const handleDelete = async (userId: any) => {
@@ -49,7 +40,8 @@ export default function UsersDashboard() {
         try {
             await deleteDoc(doc(db, 'users', idDelete));
             setIsDelete(!isDelete);
-            fetchUserData();
+            const updatedUserData = await fetchDataUser();
+            setUserData(updatedUserData);
         } catch (error) {
             console.error('Error deleting data:', error);
         }

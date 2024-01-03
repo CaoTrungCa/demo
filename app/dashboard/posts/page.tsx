@@ -1,12 +1,12 @@
 'use client'
 import { useState, useEffect } from "react";
-import { collection, deleteDoc, getDocs, getFirestore, query, doc } from "firebase/firestore";
+import { deleteDoc, getFirestore, doc } from "firebase/firestore";
 import { app } from '@/firebase/firebase';
 import { Post } from "@/lib/collection";
 import DashboardContainer from "@/components/DashboardContainer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { fetchDataPost } from "@/lib/utils/fetchData";
 
 export default function PostsDashboard() {
     const db = getFirestore(app);
@@ -18,22 +18,12 @@ export default function PostsDashboard() {
 
     const router = useRouter();
 
-    const fetchPostData = async () => {
-        const q = query(collection(db, 'posts'));
-        try {
-            const querySnapshot = await getDocs(q);
-            const postDataArray: any = [];
-            querySnapshot.forEach((doc) => {
-                postDataArray.push(doc.data());
-            });
-            setPostData(postDataArray);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
-
     useEffect(() => {
-        fetchPostData();
+        const fetchData = async () => {
+            const data = await fetchDataPost();
+            setPostData(data);
+        }
+        fetchData();
     }, []);
 
     const handleDelete = async (postId: any) => {
@@ -49,7 +39,8 @@ export default function PostsDashboard() {
         try {
             await deleteDoc(doc(db, 'posts', idDelete));
             setIsDelete(!isDelete);
-            fetchPostData();
+            const updatedPostData = await fetchDataPost();
+            setPostData(updatedPostData);
         } catch (error) {
             console.error('Error deleting data:', error);
         }
@@ -165,10 +156,12 @@ export default function PostsDashboard() {
                                         >
                                             {data.title}
                                         </td>
-                                        <td
-                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer hidden md:table-cell"
-                                        >
-                                            {data.content}
+                                        <td className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer hidden md:table-cell">
+                                            {data.content.split('\n').slice(0, 1).map((line, index) => (
+                                                <p key={index} className="mb-1">
+                                                    {line}
+                                                </p>
+                                            ))}
                                         </td>
                                         <td
                                             className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer w-28"
