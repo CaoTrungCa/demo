@@ -243,7 +243,7 @@ export default function UsersDashboard() {
                         <p className="mb-6">Are you sure you want to delete this user?</p>
                         <div className="flex justify-end">
                         <button onClick={() => cancelDelete()}
-                            className="bg-gray-300 px-4 py-2 rounded-lg mr-2" >
+                            className="bg-gray-300 text-white px-4 py-2 rounded-lg mr-2" >
                             Cancel
                         </button>
                         <button onClick={() => confirmDelete()}

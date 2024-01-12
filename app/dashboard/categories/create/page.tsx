@@ -13,16 +13,45 @@ export default function CreateUser() {
 
     const [categories, setCategories] = useState<Categories>({
         id: "",
-        title: ""
+        title: "",
+        color: "",
+        slug: ""
     });
+    const [selectedColor, setSelectedColor] = useState('blue');
+
+    const slugifyVietnamese = (text: string) => {
+        return text
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[đĐ]/g, "d")
+            .replace(/[^a-zA-Z0-9\s]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/--+/g, "-")
+            .replace(/^-+/, "")
+            .replace(/-+$/, "");
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setCategories((prevUser) => ({
-            ...prevUser,
-            [name]: value,
-        }));
+        if (name === 'title') {
+            const slugValue = slugifyVietnamese(value);
+            setCategories((prevCategory) => ({
+                ...prevCategory,
+                [name]: value,
+                slug: slugValue,
+            }));
+        } else {
+            setCategories((prevCategory) => ({
+                ...prevCategory,
+                [name]: value,
+            }));
+        }
     };
+
+    const handleColor = (color: any) => {
+        setSelectedColor(color);
+    }
 
     const handleCreate = async () => {
         try {
@@ -30,6 +59,7 @@ export default function CreateUser() {
             await setDoc(doc(db, 'categories', id), {
                 ...categories,
                 id: id,
+                color: selectedColor,
             });
             router.push("/dashboard/categories");
         } catch (error) {
@@ -63,18 +93,72 @@ export default function CreateUser() {
                             type="text"
                             id="title"
                             name="title"
-                            placeholder="Cao Bằng"
+                            placeholder="Du lịch"
                             value={categories.title}
                             onChange={handleInputChange}
                             className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                         />
+                    </div>
+                    <div className="pt-4">
+                        <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Color</label>
+                        <div className="flex gap-6 text-sm text-center">
+                            <div
+                                className={`px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-yellow-400 hover:text-white hover:border-0
+                                    ${selectedColor === 'yellow' ? `bg-yellow-400 text-white border-0` : `text-yellow-400 border border-yellow-400`}`}
+                                onClick={() => handleColor('yellow')}
+                            >
+                                Yellow
+                            </div>
+                            <div
+                                className={`px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-blue-400 hover:text-white hover:border-0
+                                    ${selectedColor === 'blue' ? `bg-blue-400 text-white border-0` : `text-blue-400 border border-blue-400`}`}
+                                onClick={() => handleColor('blue')}
+                            >
+                                Blue
+                            </div>
+                            <div
+                                className={`px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-green-400 hover:text-white hover:border-0
+                                    ${selectedColor === 'green' ? `bg-green-400 text-white border-0` : `text-green-400 border border-green-400`}`}
+                                onClick={() => handleColor('green')}
+                            >
+                                Green
+                            </div>
+                            <div
+                                className={`px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-red-400 hover:text-white hover:border-0
+                                    ${selectedColor === 'red' ? `bg-red-400 text-white border-0` : `text-red-400 border border-red-400`}`}
+                                onClick={() => handleColor('red')}
+                            >
+                                Red
+                            </div>
+                            <div
+                                className={`px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-orange-400 hover:text-white hover:border-0
+                                    ${selectedColor === 'orange' ? `bg-orange-400 text-white border-0` : `text-orange-400 border border-orange-400`}`}
+                                onClick={() => handleColor('orange')}
+                            >
+                                Orange
+                            </div>
+                            <div
+                                className={`px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-purple-400 hover:text-white hover:border-0
+                                    ${selectedColor === 'purple' ? `bg-purple-400 text-white border-0` : `text-purple-400 border border-purple-400`}`}
+                                onClick={() => handleColor('purple')}
+                            >
+                                Purple
+                            </div>
+                            <div
+                                className={`px-4 py-2 rounded-lg hover:cursor-pointer hover:bg-gray-400 hover:text-white hover:border-0
+                                    ${selectedColor === 'gray' ? `bg-gray-400 text-white border-0` : `text-gray-400 border border-gray-400`}`}
+                                onClick={() => handleColor('gray')}
+                            >
+                                Gray
+                            </div>
+                        </div>
                     </div>
                     <div className="mt-4 py-4 flex">
                         <button type="button" onClick={handleCreate} className="bg-blue-500 text-white px-4 py-2 mr-2 rounded-lg">
                             Save
                         </button>
                         <div className="w-4"></div>
-                        <button type="button" onClick={() => router.push('/dashboard/categories')} className="bg-gray-300 px-4 py-2 rounded-lg">
+                        <button type="button" onClick={() => router.push('/dashboard/categories')} className="bg-gray-300 text-white px-4 py-2 rounded-lg">
                             Cancel
                         </button>
                     </div>

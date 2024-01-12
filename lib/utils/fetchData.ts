@@ -1,5 +1,5 @@
 
-import { collection, deleteDoc, getDocs, getFirestore, query, doc } from "firebase/firestore";
+import { collection, deleteDoc, getDocs, getFirestore, query, doc, where } from "firebase/firestore";
 import { app } from '@/firebase/firebase';
 
 const db = getFirestore(app);
@@ -18,8 +18,13 @@ export async function fetchDataUser () {
         }
 };
 
-export async function fetchDataPost () {
-    const q = query(collection(db, 'posts'));
+export async function fetchDataPost(status: string[] = []) {
+    let q;
+    if (status.length > 0) {
+        q = query(collection(db, 'posts'), where('status', 'in', status));
+    } else {
+        q = query(collection(db, 'posts'));
+    }
     try {
         const querySnapshot = await getDocs(q);
         const postDataArray: any = [];
@@ -27,6 +32,21 @@ export async function fetchDataPost () {
             postDataArray.push(doc.data());
         });
         return postDataArray;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+};
+
+export async function fetchDetailPost(slug: any) {
+    let q = query(collection(db, 'posts'), where('slug', '==', slug));
+
+    try {
+        const querySnapshot = await getDocs(q);
+        const postDataArray: any = [];
+        querySnapshot.forEach((doc) => {
+            postDataArray.push(doc.data());
+        });
+        return postDataArray[0];
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -46,8 +66,13 @@ export async function fetchDataSetting () {
     }
 };
 
-export async function fetchDataCategories () {
-    const q = query(collection(db, 'categories'));
+export async function fetchDataCategories (slug: any) {
+    let q;
+    if (slug) {
+        q = query(collection(db, 'categories'), where('slug', '==', slug));
+    } else {
+        q = query(collection(db, 'categories'));
+    }
     try {
         const querySnapshot = await getDocs(q);
         const categoriesDataArray: any = [];

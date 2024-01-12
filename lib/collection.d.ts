@@ -43,4 +43,6 @@ export interface Post {
 export interface Categories {
     id: string
     title: string
+    color: string
+    slug: string
 }

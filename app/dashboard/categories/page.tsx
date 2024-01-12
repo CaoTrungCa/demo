@@ -20,7 +20,7 @@ export default function PostsDashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await fetchDataCategories();
+            const data = await fetchDataCategories('');
             setCategoriesData(data);
         }
         fetchData();
@@ -39,7 +39,7 @@ export default function PostsDashboard() {
         try {
             await deleteDoc(doc(db, 'categories', idDelete));
             setIsDelete(!isDelete);
-            const updatedCategoriesData = await fetchDataCategories();
+            const updatedCategoriesData = await fetchDataCategories('');
             setCategoriesData(updatedCategoriesData);
         } catch (error) {
             console.error('Error deleting data:', error);
@@ -121,6 +121,9 @@ export default function PostsDashboard() {
                                 <th scope="col" className="min-[320px]:px-4 md:px-6 py-5">
                                     Title
                                 </th>
+                                <th scope="col" className="min-[320px]:px-4 md:px-6 py-5">
+                                    Color
+                                </th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -141,6 +144,11 @@ export default function PostsDashboard() {
                                             className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer"
                                         >
                                             {data.title}
+                                        </td>
+                                        <td
+                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer flex justify-center"
+                                        >
+                                            <div className={`bg-${data.color}-400 h-6 w-12`}/>
                                         </td>
                                         <td className="w-24 pr-4">
                                             <Link href={`/dashboard/categories/edit/${data.id}`} className="justify-center items-center flex gap-2 py-2 px-4 rounded-lg text-white bg-blue-400 w-24 h-8">
@@ -200,7 +208,7 @@ export default function PostsDashboard() {
                         <p className="mb-6">Are you sure you want to delete this categories?</p>
                         <div className="flex justify-end">
                             <button onClick={() => cancelDelete()}
-                                className="bg-gray-300 px-4 py-2 rounded-lg mr-2" >
+                                className="bg-gray-300 text-white px-4 py-2 rounded-lg mr-2" >
                                 Cancel
                             </button>
                             <button onClick={() => confirmDelete()}

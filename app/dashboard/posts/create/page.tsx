@@ -8,6 +8,8 @@ import { Post } from "@/lib/collection";
 import Image from "next/image";
 import DashboardContainer from "@/components/DashboardContainer";
 import { useSession } from "next-auth/react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function CreatePost() {
     const db = getFirestore(app);
@@ -24,7 +26,7 @@ export default function CreatePost() {
         id: "",
         title: "",
         slug: "",
-        status: "",
+        status: "Draft",
         categories: "",
         image: "",
         content: ""
@@ -33,6 +35,20 @@ export default function CreatePost() {
     const [imageUrl, setImageUrl] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+
+    const [contentValue, setContentValue] = useState('');
+
+    const modules = {
+        toolbar: {
+            container: [
+                [{ header: [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }, { align: [] }, { 'indent': '-1' }, { 'indent': '+1' }],
+                ['link', 'image'],
+            ],
+            formats: ['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'indent', 'link', 'image'],
+        },
+    };
 
     const toggleStatusDropdown = () => {
         setIsStatusDropdownOpen(!isStatusDropdownOpen);
@@ -45,7 +61,7 @@ export default function CreatePost() {
     const handleSelectCategory = (category: string) => {
         setPost((prevPost) => ({
             ...prevPost,
-            categories: category,
+            categories: slugifyVietnamese(category),
         }));
         setIsDropdownOpen(!isDropdownOpen);
     };
@@ -145,6 +161,7 @@ export default function CreatePost() {
                 user_updated: "",
                 date_updated: "",
                 image: imageUrl || "",
+                content: contentValue || "",
             });
             router.push("/dashboard/posts");
         } catch (error) {
@@ -235,16 +252,13 @@ export default function CreatePost() {
                                     className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2 cursor-pointer"
                                     onClick={toggleStatusDropdown}
                                 >
-                                    {post.status ? post.status : 'Select Status'}
+                                    {post.status || 'Draft'}
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-compact-down absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" viewBox="0 0 16 16">
                                         <path fillRule="evenodd" d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z"/>
                                     </svg>
                                 </div>
                                 {isStatusDropdownOpen && (
                                     <ul className="absolute z-10 mt-2 w-full text-sm bg-white rounded-md shadow-lg">
-                                        <li onClick={() => handleStatusChange({ target: { value: '' } })} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
-                                            Select Status
-                                        </li>
                                         <li onClick={() => handleStatusChange({ target: { value: 'Draft' } })} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
                                             Draft
                                         </li>
@@ -336,15 +350,13 @@ export default function CreatePost() {
                             </div>
                         </label>
                     </div>
-                    <div className="pt-4">
+                    <div className="py-4">
                         <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Content</label>
-                        <textarea
-                            id="content"
-                            name="content"
+                        <ReactQuill
+                            id="editor"
+                            className="h-80 block px-0 w-full text-gray-900 text-sm py-2"
                             placeholder="Nội dung bài viết"
-                            value={post.content}
-                            onChange={handleInputChange}
-                            className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
+                            theme="snow" value={contentValue} onChange={setContentValue} modules={modules}
                         />
                     </div>
                     <div className="mt-4 py-4 flex">
@@ -352,12 +364,12 @@ export default function CreatePost() {
                             Save
                         </button>
                         <div className="w-4"></div>
-                        <button type="button" onClick={() => router.push('/dashboard/posts')} className="bg-gray-300 px-4 py-2 rounded-lg">
+                        <button type="button" onClick={() => router.push('/dashboard/posts')} className="bg-gray-300 text-white px-4 py-2 rounded-lg">
                             Cancel
                         </button>
                     </div>
                 </form>
-            </div>
+            </div>=
         </DashboardContainer>
     )
 }

@@ -20,7 +20,7 @@ export default function PostsDashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await fetchDataPost();
+            const data = await fetchDataPost([]);
             setPostData(data);
         }
         fetchData();
@@ -39,7 +39,7 @@ export default function PostsDashboard() {
         try {
             await deleteDoc(doc(db, 'posts', idDelete));
             setIsDelete(!isDelete);
-            const updatedPostData = await fetchDataPost();
+            const updatedPostData = await fetchDataPost([]);
             setPostData(updatedPostData);
         } catch (error) {
             console.error('Error deleting data:', error);
@@ -115,8 +115,8 @@ export default function PostsDashboard() {
                     </Link>
                 </div>
                 <div className="overflow-x-auto shadow-md rounded-lg">
-                    <table className="w-full table-auto text-sm text-center rtl:text-right text-gray-500">
-                        <thead className="text-xs text-white bg-blue-400 uppercase">
+                    <table className="w-full table-auto text-sm rtl:text-right text-gray-500">
+                        <thead className="text-xs text-white text-center bg-blue-400 uppercase">
                             <tr>
                                 <th scope="col" className="min-[320px]:px-4 md:px-6 py-5">
                                     Category
@@ -157,14 +157,12 @@ export default function PostsDashboard() {
                                             {data.title}
                                         </td>
                                         <td className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer hidden md:table-cell">
-                                            {data.content.split('\n').slice(0, 1).map((line, index) => (
-                                                <p key={index} className="mb-1">
-                                                    {line}
-                                                </p>
-                                            ))}
+                                            {data.content && (
+                                                <div className="truncate-3-lines" dangerouslySetInnerHTML={{__html: (data.content)}} />
+                                            )}
                                         </td>
                                         <td
-                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer w-28"
+                                            className="min-[320px]:px-4 md:px-6 py-4 cursor-pointer w-28 text-center"
                                         >
                                             <p className={`py-2 px-4 w-24 h-8 text-white rounded-lg ${data.status === 'Done' ? 'bg-green-400' : data.status === 'Draft' ? 'bg-gray-400' : ''}`}>
                                                 {data.status}
@@ -228,7 +226,7 @@ export default function PostsDashboard() {
                         <p className="mb-6">Are you sure you want to delete this post?</p>
                         <div className="flex justify-end">
                             <button onClick={() => cancelDelete()}
-                                className="bg-gray-300 px-4 py-2 rounded-lg mr-2" >
+                                className="bg-gray-300 text-white px-4 py-2 rounded-lg mr-2" >
                                 Cancel
                             </button>
                             <button onClick={() => confirmDelete()}

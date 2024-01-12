@@ -7,6 +7,8 @@ import DashboardContainer from "@/components/DashboardContainer";
 import Image from "next/image";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { useSession } from "next-auth/react";
+import ReactQuill from "react-quill";
+import 'react-quill/dist/quill.snow.css';
 
 export default function EditPost({ params }: { params: any }) {
     const db = getFirestore(app);
@@ -27,6 +29,7 @@ export default function EditPost({ params }: { params: any }) {
         user_updated: "",
         date_updated: ""
     });
+    const [contentValue, setContentValue] = useState("");
 
     useEffect(() => {
         const fetchPostData = async () => {
@@ -52,6 +55,7 @@ export default function EditPost({ params }: { params: any }) {
                         user_updated: post.user_updated || "",
                         date_updated: post.date_updated || ""
                     });
+                    setContentValue(post.content || "");
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -79,6 +83,18 @@ export default function EditPost({ params }: { params: any }) {
     const [categories, setCategories] = useState<string[]>([]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+
+    const modules = {
+        toolbar: {
+            container: [
+                [{ header: [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }, { align: [] }, { 'indent': '-1' }, { 'indent': '+1' }],
+                ['link', 'image'],
+            ],
+            formats: ['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'indent', 'link', 'image'],
+        },
+    };
 
     const toggleStatusDropdown = () => {
         setIsStatusDropdownOpen(!isStatusDropdownOpen);
@@ -112,13 +128,13 @@ export default function EditPost({ params }: { params: any }) {
             status: defaultPostData.status || "",
             categories: defaultPostData.categories || "",
             image: defaultPostData.image || "",
-            content: defaultPostData.content || "",
+            content: contentValue,
             user_created: defaultPostData.user_created || "",
             date_created: defaultPostData.date_created || "",
             user_updated: defaultPostData.user_updated || "",
             date_updated: defaultPostData.date_updated || ""
         });
-    }, [defaultPostData]);
+    }, [contentValue, defaultPostData]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -193,6 +209,10 @@ export default function EditPost({ params }: { params: any }) {
         }
     };
 
+    const handleContentChange = (value: string) => {
+        setContentValue(value);
+    };
+
     const handleEdit = async () => {
         try {
             await setDoc(doc(db, 'posts', params.postId), {
@@ -200,7 +220,7 @@ export default function EditPost({ params }: { params: any }) {
                 title: postData.title,
                 slug: postData.slug,
                 status: postData.status,
-                categories: postData.categories,
+                categories: slugifyVietnamese(postData.categories),
                 image: imageUrl,
                 content: postData.content,
                 user_created: postData.user_created,
@@ -314,16 +334,13 @@ export default function EditPost({ params }: { params: any }) {
                                     className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2 cursor-pointer"
                                     onClick={toggleStatusDropdown}
                                 >
-                                    {postData.status ? postData.status : 'Select Status'}
+                                    {postData.status ? postData.status : 'Draft'}
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-compact-down absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" viewBox="0 0 16 16">
                                         <path fillRule="evenodd" d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z"/>
                                     </svg>
                                 </div>
                                 {isStatusDropdownOpen && (
                                     <ul className="absolute z-10 mt-2 w-full text-sm bg-white rounded-md shadow-lg">
-                                        <li onClick={() => handleStatusChange({ target: { value: '' } })} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
-                                            Select Status
-                                        </li>
                                         <li onClick={() => handleStatusChange({ target: { value: 'Draft' } })} className="px-4 py-3 cursor-pointer hover:bg-blue-100" >
                                             Draft
                                         </li>
@@ -415,22 +432,24 @@ export default function EditPost({ params }: { params: any }) {
                             </div>
                         </label>
                     </div>
-                    <div className="pt-4">
+                    <div className="py-4">
                         <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Content</label>
-                        <textarea
+                        <ReactQuill
                             id="content"
-                            name="content"
+                            className="h-80 block px-0 w-full text-gray-900 text-sm py-2"
                             placeholder="Nội dung bài viết"
-                            value={postData.content}
-                            onChange={handleInputChange}
-                            className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
+
+                            theme="snow"
+                            value={contentValue}
+                            modules={modules}
+                            onChange={(value) => handleContentChange(value)}
                         />
                     </div>
                     <div className="mt-4 py-4 flex gap-4">
                         <button type="button" onClick={handleEdit} className="bg-blue-500 text-white px-4 py-2 mr-2 rounded-lg">
                             Save
                         </button>
-                        <button type="button" onClick={() => router.push('/dashboard/posts')} className="bg-gray-300 px-4 py-2 mr-2 rounded-lg">
+                        <button type="button" onClick={() => router.push('/dashboard/posts')} className="bg-gray-300 text-white px-4 py-2 mr-2 rounded-lg">
                             Cancel
                         </button>
                         <button type="button" onClick={() => handleDelete(params.postId)} className="py-2 px-4 rounded-lg text-white bg-red-400">
@@ -446,7 +465,7 @@ export default function EditPost({ params }: { params: any }) {
                         <p className="mb-6">Are you sure you want to delete this post?</p>
                         <div className="flex justify-end">
                         <button onClick={() => cancelDelete()}
-                            className="bg-gray-300 px-4 py-2 rounded-lg mr-2" >
+                            className="bg-gray-300 text-white px-4 py-2 rounded-lg mr-2" >
                             Cancel
                         </button>
                         <button onClick={() => confirmDelete()}

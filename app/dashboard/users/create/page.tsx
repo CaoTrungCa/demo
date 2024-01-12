@@ -278,7 +278,7 @@ export default function CreateUser() {
                             Save
                         </button>
                         <div className="w-4"></div>
-                        <button type="button" onClick={() => router.push('/dashboard/users')} className="bg-gray-300 px-4 py-2 rounded-lg">
+                        <button type="button" onClick={() => router.push('/dashboard/users')} className="bg-gray-300 text-white px-4 py-2 rounded-lg">
                             Cancel
                         </button>
                     </div>

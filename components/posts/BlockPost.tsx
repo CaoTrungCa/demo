@@ -1,6 +1,6 @@
 'use client'
-import { Post } from "@/lib/collection";
-import { fetchDataPost } from "@/lib/utils/fetchData";
+import { Categories, Post } from "@/lib/collection";
+import { fetchDataPost, fetchDataCategories } from "@/lib/utils/fetchData";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import Image from "next/image";
 export default function BlockPost() {
 
     const [postData, setPostData] = useState<Post[]>([]);
+    const [categoryData, setCategoryData] = useState<Categories[]>([]);
 
     const calculateReadTime = (content: string) => {
         const wordsPerMinute = 200;
@@ -39,10 +40,15 @@ export default function BlockPost() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await fetchDataPost();
+            const data = await fetchDataPost(['Done']);
             setPostData(data);
         }
         fetchData();
+        const fetchDataCategory = async () => {
+            const data = await fetchDataCategories('');
+            setCategoryData(data)
+        }
+        fetchDataCategory();
     }, []);
 
     return (
@@ -61,15 +67,15 @@ export default function BlockPost() {
                                 />
                             </div>
                             <div className='md:col-span-1 h-64 mx-6'>
-                                <div className='text-xl h-16 mt-4 font-bold text-left hover:text-orange-400 overflow-hidden'
+                                <div className='text-xl h-16 mt-4 font-bold text-left hover:text-blue-400 overflow-hidden'
                                     style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                                     <p>{post.title}</p>
                                 </div>
-                                <div className='text-lg h-24 mt-4 text-left overflow-hidden'
+                                <div className='text-lg h-20 mt-4 text-left overflow-hidden'
                                     style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical' }}>
-                                    {post.content}
+                                    <div dangerouslySetInnerHTML={{__html: post.content}} />
                                 </div>
-                                <div className='flex h-8 mt-4 items-center justify-between space-x-4'>
+                                <div className='flex h-16 mt-4 items-center justify-between space-x-4'>
                                     <div className='flex items-center space-x-2'>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clock" viewBox="0 0 16 16">
                                             <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
@@ -89,14 +95,21 @@ export default function BlockPost() {
                                         )}
                                     </div>
                                     {post.categories && (
-                                        <Link
-                                            href={`/posts/categories/${post.categories}`}
-                                            className='hover:opacity-90'
-                                        >
-                                            <div className='rounded-br-lg px-4 py-2 rounded-tl-lg bg-blue-400 text-white'>
-                                                {post.categories}
-                                            </div>
-                                        </Link>
+                                        <div>
+                                            {categoryData
+                                                .filter(category => category.slug === post.categories)
+                                                .map((filteredCategory, categoryIdx) => (
+                                                    <Link key={categoryIdx}
+                                                        href={`/posts/categories/${filteredCategory.slug}`}
+                                                        className='hover:opacity-90'
+                                                    >
+                                                        <div className={`rounded-br-lg px-4 py-2 rounded-tl-lg bg-${filteredCategory.color}-400 text-white`}>
+                                                            {filteredCategory.title}
+                                                        </div>
+                                                    </Link>
+                                                ))
+                                            }
+                                        </div>
                                     )}
                                 </div>
                             </div>
