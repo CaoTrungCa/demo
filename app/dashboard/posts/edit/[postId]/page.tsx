@@ -151,6 +151,9 @@ export default function EditPost({ params }: { params: any }) {
     }, [db]);
 
     const slugifyVietnamese = (text: string) => {
+        if (text.includes('-')) {
+            return text;
+        }
         return text
             .toLowerCase()
             .normalize("NFD")

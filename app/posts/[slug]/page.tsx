@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import PageContainer from "@/components/PageContainer";
 import { fetchDetailPost } from "@/lib/utils/fetchData";
 import Image from "next/image";
+import AdCode from "@/components/AdCode";
 
 export default function Posts({ params }: { params: any }) {
     const [postData, setPostData] = useState({
@@ -37,6 +38,7 @@ export default function Posts({ params }: { params: any }) {
                     {postData.title}
                 </div>
                 <div dangerouslySetInnerHTML={{__html: (postData.content)}} />
+                {/* <AdCode /> */}
             </div>
         </PageContainer>
     )

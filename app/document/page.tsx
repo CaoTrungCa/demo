@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode.react';
 import html2canvas from "html2canvas";
 import PageContainer from "@/components/PageContainer";
@@ -7,6 +7,24 @@ import PageContainer from "@/components/PageContainer";
 export default function Document() {
     const [url, setUrl] = useState('');
     const [qrCodeValue, setQrCodeValue] = useState('');
+
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    useEffect(() => {
+        if (iframeRef.current) {
+          iframeRef.current.src = url;
+        }
+    }, [url]);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+          if (iframeRef.current) {
+            iframeRef.current.src = url;
+          }
+        }, 30000);
+
+        return () => clearInterval(intervalId);
+    }, [url]);
 
     const handleInputChange = (e: any) => {
         setUrl(e.target.value);
@@ -65,6 +83,14 @@ export default function Document() {
                         </button>
                     </div>
                 )}
+            </div>
+            <div className="overflow-hidden flex gap-8">
+                <iframe
+                    ref={iframeRef}
+                    src={url}
+                    className="w-full h-96 mx-auto mt-20 p-10 border rounded shadow-lg "
+                    title="Web Viewer"
+                ></iframe>
             </div>
         </PageContainer>
     )
