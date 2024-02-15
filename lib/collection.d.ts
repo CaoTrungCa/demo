@@ -24,6 +24,8 @@ export interface Setting {
     link_tiktok: string
     link_github: string
     link_youtube: string
+    title: string
+    description: string
 }
 
 export interface Post {

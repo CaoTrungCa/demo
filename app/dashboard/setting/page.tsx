@@ -5,7 +5,7 @@ import { app } from "@/firebase/firebase";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Setting } from "@/lib/collection";
 import { fetchDataSetting } from "@/lib/utils/fetchData";
@@ -30,6 +30,8 @@ export default function SettingDashboard() {
         link_tiktok: "",
         link_github: "",
         link_youtube: "",
+        title: "",
+        description: ""
     });
 
     useEffect(() => {
@@ -81,7 +83,7 @@ export default function SettingDashboard() {
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setSettingData({ ...settingData, [name]: value });
     };
@@ -100,6 +102,8 @@ export default function SettingDashboard() {
                 link_tiktok: settingData.link_tiktok,
                 link_github: settingData.link_github,
                 link_youtube: settingData.link_youtube,
+                title: settingData.title,
+                description: settingData.description
             });
 
             setIsReadOnly(!isReadOnly);
@@ -163,7 +167,7 @@ export default function SettingDashboard() {
                                     </div>
                                 </label>
                             ) : (
-                                <div className="aspect-video rounded flex items-center justify-center border-2 border-dashed">
+                                <div className="aspect-video rounded flex items-center justify-center border-0 border-dashed">
                                     <Image
                                         src={settingData.logo ? settingData.logo : "https://flowbite.com/docs/images/logo.svg"}
                                         width={100}
@@ -235,6 +239,40 @@ export default function SettingDashboard() {
                                     className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
                                 />
                             </div>
+                        </div>
+                    </div>
+                    <div className="mt-4 rounded-lg border border-dashed p-4">
+                        <h1 className="text-xl font-bold flex gap-2 items-center text-gray-900 dark:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-joystick" viewBox="0 0 16 16">
+                                <path d="M10 2a2 2 0 0 1-1.5 1.937v5.087c.863.083 1.5.377 1.5.726 0 .414-.895.75-2 .75s-2-.336-2-.75c0-.35.637-.643 1.5-.726V3.937A2 2 0 1 1 10 2"/>
+                                <path d="M0 9.665v1.717a1 1 0 0 0 .553.894l6.553 3.277a2 2 0 0 0 1.788 0l6.553-3.277a1 1 0 0 0 .553-.894V9.665c0-.1-.06-.19-.152-.23L9.5 6.715v.993l5.227 2.178a.125.125 0 0 1 .001.23l-5.94 2.546a2 2 0 0 1-1.576 0l-5.94-2.546a.125.125 0 0 1 .001-.23L6.5 7.708l-.013-.988L.152 9.435a.25.25 0 0 0-.152.23"/>
+                            </svg>
+                            SEO
+                        </h1>
+                        <div className="pt-4">
+                            <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                placeholder="What's the website title?"
+                                readOnly={isReadOnly}
+                                value={settingData.title}
+                                onChange={(e) => handleInputChange(e)}
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
+                            />
+                        </div>
+                        <div className="pt-4">
+                            <label className="block my-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                placeholder=""
+                                readOnly={isReadOnly}
+                                value={settingData.description}
+                                onChange={(e) => handleInputChange(e)}
+                                className="w-full pl-4 border-b focus:outline-none focus:border-blue-400 focus:border-b-2 text-gray-900 text-sm block p-2"
+                            />
                         </div>
                     </div>
                     <div className="mt-4 rounded-lg border border-dashed p-4">
