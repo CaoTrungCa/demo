@@ -9,16 +9,15 @@ import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const globals = await fetchDataSetting()
-  const data = globals
   const url = globals.logo
   return {
     title: {
-      template: `%s | ${data?.title ?? 'Cao Trung'}`,
-      default: data.title || 'Cao Trung',
+      template: `%s | ${globals?.title ?? 'Cao Trung'}`,
+      default: globals.title || 'Cao Trung',
     },
     viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
-    description: data.description,
-    openGraph: { images: (data.logo || '') },
+    description: globals.description,
+    openGraph: { images: (globals.logo || '') },
     icons: {
       icon: [url],
     },

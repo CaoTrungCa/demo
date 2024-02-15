@@ -1,6 +1,12 @@
-"use client"
 import DashboardContainer from "@/components/DashboardContainer";
 import { useSession } from "next-auth/react";
+import { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `Dashboard`,
+  }
+}
 
 export default function Dashboard() {
     return (

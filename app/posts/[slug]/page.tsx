@@ -1,45 +1,22 @@
-'use client'
-import { useEffect, useState } from "react";
 import PageContainer from "@/components/PageContainer";
 import { fetchDetailPost } from "@/lib/utils/fetchData";
-import Image from "next/image";
-import AdCode from "@/components/AdCode";
+import PostsDetailBlock from "@/components/block/posts/PostsDetailBlock";
+import { Metadata } from "next";
 
-export default function Posts({ params }: { params: any }) {
-    const [postData, setPostData] = useState({
-        title: "",
-        slug: "",
-        status: "",
-        categories: "",
-        image: "",
-        content: "",
-        user_created: "",
-        date_created: "",
-        user_updated: "",
-        date_updated: ""
-    });
+export async function generateMetadata({ params }: { params: any }): Promise<Metadata> {
+    const data = await fetchDetailPost(params.slug);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await fetchDetailPost(params.slug);
-            setPostData(data);
-        }
-        fetchData();
-    }, [params.slug]);
+    return {
+        title: data.title
+    };
+}
+
+export default async function Posts({ params }: { params: any }) {
+    const data = await fetchDetailPost(params.slug);
 
     return (
         <PageContainer>
-            <div>
-                <div>
-                    <Image src={postData.image ? postData.image : '/user/bg_default.jpg'} height={100} width={100} alt={postData.title}
-                        className="h-auto w-full" />
-                </div>
-                <div>
-                    {postData.title}
-                </div>
-                <div dangerouslySetInnerHTML={{__html: (postData.content)}} />
-                {/* <AdCode /> */}
-            </div>
+            <PostsDetailBlock data={data} />
         </PageContainer>
-    )
+    );
 }
