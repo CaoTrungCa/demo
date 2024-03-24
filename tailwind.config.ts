@@ -27,6 +27,12 @@ const config: Config = {
           ".bg-icon-theme": {
             "background-color": "rgba(0, 0, 0, 0.4)",
           },
+          ".bg-menu": {
+            "background-color": "rgba(0, 0, 0)",
+          },
+          ".border-icon-theme": {
+            "border": "1px solid #ffffff",
+          },
         },
         dark: {
           ...require("daisyui/src/theming/themes")["[data-theme=dark]"],
@@ -35,6 +41,12 @@ const config: Config = {
           },
           ".bg-icon-theme": {
             "background-color": "rgba(255, 255, 255, 0.4)",
+          },
+          ".bg-menu": {
+            "background-color": "rgba(255, 255, 255)",
+          },
+          ".border-icon-theme": {
+            "border": "1px solid #000000",
           },
         },
       },
